@@ -1,204 +1,553 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>YE SENDERO del SABER</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Sendero del Saber | Plataforma Educativa con Firebase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
-
 <body>
 
-<header>
+<!-- ==================== LANDING PAGE COMPLETA ==================== -->
+<div id="mainScreen">
+  <div class="landing-header">
+    <div class="logo-header">
+      <img src="images/logo.jpg" alt="Logo">
+    </div>
+    <div class="auth-links">
+      <button class="login-btn" id="btnLogin">Iniciar sesión</button>
+      <button class="register-btn" id="btnRegister">Registrarse</button>
+    </div>
+  </div>
+
+  <div class="landing-container">
+    <div class="hero-banner">
+      <canvas id="forestCanvas" class="forest-canvas"></canvas>
+      <div class="banner-content">
+        <p class="banner-subtitle">COMIENZA TU</p>
+        <img src="images/sendero-del-saber-title.png" alt="SENDERO del SABER" class="banner-title-image">
+        <p class="banner-tagline">CRECE, APRENDE Y SIGUE AVANZANDO,<br>PERO SIEMPRE A TU RITMO.</p>
+        <img src="images/btn-empieza.png" alt="EMPIEZA" class="btn-empieza-img" onclick="document.getElementById('btnRegister').click()">
+      </div>
+    </div>
+  </div>
+
+  <div class="cursos-destacados-section">
+    <div class="landing-container">
+      <div class="section-header">
+        <h2>APRENDE CON CURSOS DIVERTIDOS E INTERACTIVOS</h2>
+        <p class="section-subtitle">ELABORADOS A MANO POR ESTUDIANTES DE LA UNIVERSIDAD DE PANAMÁ.</p>
+      </div>
+      <div class="courses-grid" id="coursesGrid"></div>
+      <div class="cursos-button-container">
+        <button class="btn-cursos-madera" onclick="document.getElementById('btnRegister').click()">CURSOS</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-stories">
+    <div class="stories-container">
+      <h2>HISTORIAS DE ÉXITO DE NUESTROS ALUMNOS</h2>
+      <div class="stories-grid">
+        <div class="story-card">
+          <h4>CURSO LENGUAJE DE SEÑAS</h4>
+          <p>Aprende lenguaje de señas de forma divertida, promoviendo la inclusión y la comunicación...</p>
+          <span class="story-badge">PRINCIPIANTE</span>
+        </div>
+        <div class="story-card">
+          <h4>CURSO MATEMÁTICAS</h4>
+          <p>Domina las matemáticas con métodos interactivos y ejercicios prácticos para todos los niveles...</p>
+          <span class="story-badge">PRINCIPIANTE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-section">
+    <div class="about-container">
+      <h2>Acerca de</h2>
+      <div class="mission-vision">
+        <div class="mission">
+          <h3>Misión</h3>
+          <p>Empoderar a los estudiantes a través de una educación personalizada.</p>
+        </div>
+        <div class="vision">
+          <h3>Visión</h3>
+          <p>Ser una comunidad donde cada persona trace su propio sendero.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="images/sendero-del-saber-title.png" alt="SENDERO del SABER" class="footer-logo">
+      <p class="footer-subtitle">FIN DEL SENDERO</p>
+      <nav class="footer-nav">
+        <a href="#">INICIO</a>
+        <a href="#">CURSOS</a>
+        <a href="#">ACERCA DE</a>
+        <a href="#">CONTACTANOS</a>
+      </nav>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-youtube"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-pinterest"></i></a>
+        <a href="#"><i class="fab fa-whatsapp"></i></a>
+      </div>
+      <div class="footer-copyright">© 2026 SENDERO DEL SABER - CRECE, APRENDE Y SIGUE AVANZANDO, PERO SIEMPRE A TU RITMO.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ==================== MODALES ==================== -->
+<div id="registerModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeRegisterModal()">&times;</span>
+    <h2>Crear cuenta</h2>
+    <div class="role-buttons">
+      <button class="role-btn active" data-role="estudiante" onclick="selectRole('estudiante')">Estudiante</button>
+      <button class="role-btn" data-role="padre" onclick="selectRole('padre')">Padre</button>
+    </div>
+    <input type="text" id="regNombre" placeholder="Nombre completo">
+    <input type="email" id="regEmail" placeholder="Correo electrónico">
+    <input type="password" id="regPassword" placeholder="Contraseña">
+    <div id="padreFields" style="display:none;">
+      <div class="codigo-info">Ingresa el código de vinculación del estudiante</div>
+      <input type="text" id="codigoVinculacion" placeholder="Código (ej: SEN-ABCD-1234)">
+    </div>
+    <button class="modal-btn" onclick="registrarUsuario()">Registrarse</button>
+    <div class="switch-form">¿Ya tienes cuenta? <span onclick="switchToLogin()">Iniciar sesión</span></div>
+  </div>
+</div>
+
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+    <h2>Iniciar sesión</h2>
+    <input type="email" id="loginEmail" placeholder="Correo electrónico">
+    <input type="password" id="loginPassword" placeholder="Contraseña">
+    <button class="modal-btn" onclick="iniciarSesion()">Ingresar</button>
+    <div class="switch-form">¿No tienes cuenta? <span onclick="switchToRegister()">Regístrate</span></div>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD ESTUDIANTE ==================== -->
+<div id="dashboardEstudiante" class="dashboard-islas" style="display: none;">
+  <div class="dashboard-header">
+    <div class="dashboard-logo">
+      <img src="images/logo.jpg" alt="Logo">
+      <span>Tu Viaje Comienza Aquí</span>
+    </div>
+    <div class="user-info-dash">
+      <span class="user-name" id="dashUserName"></span>
+      <button class="logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+    </div>
+  </div>
+
+  <div class="ocean-background">
     
-      <img src="logo-sendero.png" alt="Logo de Sendero del Saber">
+    <!-- FOXY - EL GUÍA -->
+    <div id="foxy-guide" class="foxy-container">
+      <img src="images/foxy.png" alt="Foxy" id="foxy-avatar" class="foxy-avatar">
+      <div id="foxy-bubble" class="foxy-bubble">
+        <span id="foxy-text">¡Hola! Tu aventura comienza aquí 🌟</span>
+        <button id="close-foxy" class="close-foxy">✖</button>
+      </div>
+    </div>
 
-    <h1>YE SENDERO del SABER</h1>
+    <div class="islands-container">
+      <div class="welcome-islands">
+        <img src="images/title-letrero.png" alt="SENDERO del SABER" class="dashboard-title-image">
+      </div>
 
-    <nav>
-        <a href="#registro">Registro</a>
-        <a href="#login">Iniciar Sesión</a>
-    </nav>
-</header>
+      <!-- ISLAS FLOTANTES -->
+      <div class="island" id="isla-viento" onclick="abrirMateria(4)">
+        <img src="images/isla-viento.png" alt="Isla Señales Al Viento">
+      </div>
+      <div class="island" id="isla-palabra" onclick="abrirMateria(1)">
+        <img src="images/isla-palabra.png" alt="Isla Palabra Perdida">
+      </div>
+      <div class="island" id="isla-codigo" onclick="abrirMateria(2)">
+        <img src="images/isla-codigo.png" alt="Isla Código Escondido">
+      </div>
+      <div class="island" id="isla-calculo" onclick="abrirMateria(3)">
+        <img src="images/isla-calculo.png" alt="Isla Cálculo Eterno">
+      </div>
+    </div>
+  </div>
+</div>
 
-<main>
+<!-- ==================== DASHBOARD PADRE ==================== -->
+<div id="dashboardPadre" class="dashboard-padre" style="display: none;">
+  <div class="dashboard-header">
+    <div class="dashboard-logo"><img src="images/logo.jpg" alt="Logo"><span>Panel Padre</span></div>
+    <div class="user-info-dash"><span id="dashPadreUserName"></span><button class="logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+  </div>
+  <div class="dashboard-layout">
+    <div class="side-menu">
+      <div class="side-item" data-padre-view="hijos"><i class="fas fa-child"></i> Mis hijos</div>
+      <div class="side-item" data-padre-view="perfil"><i class="fas fa-user"></i> Mi Perfil</div>
+    </div>
+    <div class="main-content-dash" id="mainContentPadre"><div class="loading">Cargando...</div></div>
+  </div>
+</div>
 
-<section>
-    <h2>Selecciona tu perfil</h2>
-    <a href="#estudiantes">Estudiante</a>
-    <a href="#familiar">Padre de familia</a>
-</section>
+<!-- ==================== VISTA MATERIA ==================== -->
+<div id="materiaView" class="materia-view" style="display: none;">
+  <div class="dashboard-header">
+    <div class="dashboard-logo"><img src="images/logo.jpg" alt="Logo"><span>Estudiando</span></div>
+    <div class="user-info-dash"><span id="materiaUserName"></span><button class="logout-btn" onclick="cerrarSesionDesdeMateria()"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+  </div>
+  <div class="dashboard-layout" style="display:block; padding:30px;">
+    <button class="btn-volver-materia" onclick="volverAlDashboard()"><i class="fas fa-arrow-left"></i> Volver</button>
+    <div id="materiaContenido"></div>
+  </div>
+</div>
 
-<section id="registro">
-    <h2>Registro</h2>
+<script>
+// ========== CONFIGURACIÓN FIREBASE ==========
+const firebaseConfig = {
+  apiKey: "AIzaSyDENMbhhvQY21y7rCV7r2-T8ewXy0Jg2N8",
+  authDomain: "sendero-del-saber.firebaseapp.com",
+  projectId: "sendero-del-saber"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-    <form>
-        <label>Nombre:</label>
-        <input type="text" name="nombre">
+// ========== VARIABLES GLOBALES ==========
+let usuarioActual = null;
+let currentRole = 'estudiante';
+let materiaActual = null;
+let tabActual = 'videso';
+let opcionesSeleccionadas = {};
 
-        <br><br>
+// ========== DATOS DE CURSOS ==========
+const cursosDisponibles = [
+  { id: 1, nombre: 'Español', descripcion: 'Literatura, gramática y ortografía', imagen: 'images/espanol.jpg' },
+  { id: 2, nombre: 'Programación', descripcion: 'JavaScript, HTML, CSS y SQL', imagen: 'images/programacion.jpg' },
+  { id: 3, nombre: 'Matemáticas', descripcion: 'Aritmética, álgebra y geometría', imagen: 'images/matematicas.jpg' },
+  { id: 4, nombre: 'Lenguaje de señas', descripcion: 'Comunicación inclusiva', imagen: 'images/lenguaje-senas.jpg' }
+];
 
-        <label>Correo:</label>
-        <input type="email" name="correo">
+const materiasData = {
+  1: { nombre: 'Español', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Identifica el sustantivo', descripcion: 'Escribe 5 sustantivos que encuentres en tu casa.' }], ejercicios: [{ id: 1, pregunta: '¿Cuál es la definición de sustantivo?', opciones: ['Una acción', 'Personas, animales o cosas', 'Una característica', 'Un lugar'], correcta: 1 }] },
+  2: { nombre: 'Programación', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Tu primer código', descripcion: 'Escribe "Hola Mundo" en el editor.' }], ejercicios: [{ id: 1, pregunta: '¿Qué significa HTML?', opciones: ['Hyper Text Markup Language', 'High Tech Language', 'Home Tool Language', 'Hyper Make Language'], correcta: 0 }] },
+  3: { nombre: 'Matemáticas', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Sumas básicas', descripcion: 'Resuelve: 15 + 27 = ?' }], ejercicios: [{ id: 1, pregunta: '¿Cuánto es 5 x 6?', opciones: ['25', '30', '35', '40'], correcta: 1 }] },
+  4: { nombre: 'Lenguaje de señas', videoUrl: 'videos/lenguaje-senas.mp4', practicas: [{ id: 1, titulo: 'Alfabeto manual', descripcion: 'Practica las señas de las letras A, B, C.' }], ejercicios: [{ id: 1, pregunta: '¿Para quién es importante la comunicación por señas?', opciones: ['Personas con discapacidad auditiva', 'Solo niños', 'Solo en la escuela', 'No es importante'], correcta: 0 }] }
+};
 
-        <br><br>
+// ========== FUNCIONES AUXILIARES ==========
+function escapeXSS(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
 
-        <label>Contraseña:</label>
-        <input type="password" name="password">
+function generarCodigoUnico() {
+  const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let p1 = '', p2 = '';
+  for (let i = 0; i < 4; i++) p1 += letras[Math.floor(Math.random() * letras.length)];
+  for (let i = 0; i < 4; i++) p2 += Math.floor(Math.random() * 10);
+  return `SEN-${p1}-${p2}`;
+}
 
-        <br><br>
+// ========== REGISTRO ==========
+async function registrarUsuario() {
+  const nombre = document.getElementById('regNombre').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const rol = currentRole;
+  const codigoPadre = document.getElementById('codigoVinculacion').value.trim();
 
-        <button>Registrarse</button>
-    </form>
-</section>
+  if (!nombre || !email || !password) { notifier.showToast('Completa todos los campos', 'warning'); return; }
+  if (password.length < 6) { notifier.showToast('La contraseña debe tener al menos 6 caracteres', 'warning'); return; }
 
+  try {
+    const existing = await db.collection('usuarios').where('email', '==', email).get();
+    if (!existing.empty) { notifier.showToast('Ya existe una cuenta con este correo', 'error'); return; }
+    if (rol === 'padre' && !codigoPadre) { notifier.showToast('Ingresa el código de vinculación', 'warning'); return; }
 
-<section id="login">
-    <h2>Inicio de Sesión</h2>
+    let codigoVinculacion = null;
+    if (rol === 'estudiante') {
+      codigoVinculacion = generarCodigoUnico();
+      let existe = true;
+      while (existe) {
+        const check = await db.collection('usuarios').where('codigoVinculacion', '==', codigoVinculacion).get();
+        if (check.empty) existe = false;
+        else codigoVinculacion = generarCodigoUnico();
+      }
+    } else {
+      const estudianteSnap = await db.collection('usuarios').where('codigoVinculacion', '==', codigoPadre).where('rol', '==', 'estudiante').get();
+      if (estudianteSnap.empty) { notifier.showToast('Código inválido', 'error'); return; }
+      codigoVinculacion = codigoPadre;
+    }
 
-    <form>
-        <label>Correo:</label>
-        <input type="email" name="correo">
+    await db.collection('usuarios').add({
+      nombre, email, password, rol, codigoVinculacion,
+      misCursos: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-        <br><br>
+    notifier.showToast(rol === 'estudiante' ? `Registro exitoso. Código: ${codigoVinculacion}` : 'Registro exitoso', 'success');
+    closeRegisterModal();
+    showLoginModal();
+  } catch (error) { alert('Error: ' + error.message); }
+}
 
-        <label>Contraseña:</label>
-        <input type="password" name="password">
+// ========== INICIAR SESIÓN ==========
+async function iniciarSesion() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { notifier.showToast('Completa todos los campos', 'warning'); return; }
 
-        <br><br>
+  try {
+    const usuariosSnap = await db.collection('usuarios').where('email', '==', email).where('password', '==', password).get();
+    if (usuariosSnap.empty) { notifier.showToast('Credenciales incorrectas', 'error'); return; }
 
-        <button>Ingresar</button>
-    </form>
-</section>
+    usuarioActual = { id: usuariosSnap.docs[0].id, ...usuariosSnap.docs[0].data() };
+    localStorage.setItem('usuarioActualId', usuarioActual.id);
+    closeLoginModal();
+    document.getElementById('mainScreen').style.display = 'none';
 
+    if (usuarioActual.rol === 'estudiante') {
+      document.getElementById('dashboardEstudiante').style.display = 'block';
+      document.getElementById('dashUserName').innerText = escapeXSS(usuarioActual.nombre);
+      // Mostrar bienvenida de Foxy
+      setTimeout(() => {
+        const foxyBubble = document.getElementById('foxy-bubble');
+        const foxyText = document.getElementById('foxy-text');
+        if (foxyBubble && foxyText) {
+          foxyBubble.classList.remove('hidden');
+          foxyText.textContent = '¡Bienvenida ' + escapeXSS(usuarioActual.nombre) + '! Tu aventura comienza aquí 🌟';
+        }
+      }, 800);
+    } else {
+      document.getElementById('dashboardPadre').style.display = 'block';
+      document.getElementById('dashPadreUserName').innerText = escapeXSS(usuarioActual.nombre);
+      renderVistaPadre();
+    }
+  } catch (error) { alert('Error: ' + error.message); }
+}
 
-<section id="estudiantes">
-    <h2>Panel del Estudiante</h2>
+// ========== CERRAR SESIÓN ==========
+async function cerrarSesion() {
+  usuarioActual = null;
+  localStorage.removeItem('usuarioActualId');
+  document.getElementById('dashboardEstudiante').style.display = 'none';
+  document.getElementById('dashboardPadre').style.display = 'none';
+  document.getElementById('materiaView').style.display = 'none';
+  document.getElementById('mainScreen').style.display = 'block';
+}
 
-    <article>
-        <h3>Progreso</h3>
-        <p>El estudiante podrá ver su avance en los cursos.</p>
-    </article>
+// ========== FUNCIONES ESTUDIANTE ==========
+function abrirMateria(cursoId) {
+  materiaActual = materiasData[cursoId];
+  if (!materiaActual) return;
+  document.getElementById('dashboardEstudiante').style.display = 'none';
+  document.getElementById('materiaView').style.display = 'block';
+  document.getElementById('materiaUserName').innerText = escapeXSS(usuarioActual.nombre);
+  tabActual = 'video';
+  renderMateria();
+}
 
-    
-    <article>
-        <h3>Cursos disponibles</h3>
+function renderMateria() {
+  let html = `<div class="dashboard-card"><h2>${materiaActual.nombre}</h2><div class="tabs-container">
+    <button class="tab-btn ${tabActual === 'video' ? 'active' : ''}" onclick="cambiarTab('video')">📹 Video</button>
+    <button class="tab-btn ${tabActual === 'practicas' ? 'active' : ''}" onclick="cambiarTab('practicas')">✏️ Prácticas</button>
+    <button class="tab-btn ${tabActual === 'ejercicios' ? 'active' : ''}" onclick="cambiarTab('ejercicios')">📝 Ejercicios</button>
+  </div>`;
+  
+  if (tabActual === 'video') {
+    if (materiaActual.videoUrl.includes('.mp4')) {
+      html += `<div class="video-container"><video controls style="width:100%; border-radius:20px;"><source src="${materiaActual.videoUrl}" type="video/mp4">Tu navegador no soporta video</video></div>`;
+    } else {
+      html += `<div class="video-container"><iframe src="${materiaActual.videoUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+    }
+  }
+  if (tabActual === 'practicas') html += `<div>${materiaActual.practicas.map(p => `<div class="pregunta-item"><strong>${p.titulo}</strong><p>${p.descripcion}</p><textarea id="practica_${p.id}" class="textarea-practica" placeholder="Escribe tu respuesta..."></textarea><button class="btn-respuesta" onclick="guardarPractica(${p.id})">Guardar respuesta</button></div>`).join('')}</div>`;
+  if (tabActual === 'ejercicios') html += `<div>${materiaActual.ejercicios.map(e => `<div class="pregunta-item"><div class="pregunta-texto">${e.pregunta}</div><div class="opciones">${e.opciones.map((op, idx) => `<div class="opcion" onclick="seleccionarOpcion(${e.id}, ${idx})">${String.fromCharCode(65 + idx)}. ${op}</div>`).join('')}</div><button class="btn-respuesta" onclick="verificarRespuesta(${e.id})">Verificar</button><div id="resEj_${e.id}"></div></div>`).join('')}</div>`;
+  document.getElementById('materiaContenido').innerHTML = html;
+}
 
-        <figure>
-            <figcaption><a href="#curso1">Lenguaje de señas</a></figcaption>
-        </figure>
+window.cambiarTab = (tab) => { tabActual = tab; renderMateria(); };
+window.guardarPractica = (id) => { notifier.showToast('Respuesta guardada', 'success'); };
+window.seleccionarOpcion = (id, idx) => { opcionesSeleccionadas[id] = idx; document.querySelectorAll(`#pregunta_${id} .opcion`).forEach((el, i) => { if (i === idx) el.classList.add('selected'); else el.classList.remove('selected'); }); };
+window.verificarRespuesta = (id) => { const ej = materiaActual.ejercicios.find(e => e.id === id); if (opcionesSeleccionadas[id] === undefined) { notifier.showToast('Selecciona una respuesta', 'warning'); } else { const div = document.getElementById(`resEj_${id}`); div.innerHTML = opcionesSeleccionadas[id] === ej.correcta ? '<span class="correcto">✅ Correcto</span>' : `<span class="incorrecto">❌ Incorrecto</span>`; } };
 
-        <figure>
-            <figcaption><a href="#curso2">Matemáticas</a></figcaption>
-        </figure>
+function volverAlDashboard() { document.getElementById('materiaView').style.display = 'none'; document.getElementById('dashboardEstudiante').style.display = 'block'; }
+function cerrarSesionDesdeMateria() { volverAlDashboard(); cerrarSesion(); }
 
-        <figure>
-            <figcaption><a href="#curso3">Programación</a></figcaption>
-        </figure>
+// ========== FUNCIONES PADRE ==========
+async function getHijosVinculados() {
+  if (!usuarioActual || usuarioActual.rol !== 'padre') return [];
+  const cod = usuarioActual.codigoVinculacion;
+  const hijosSnap = await db.collection('usuarios').where('codigoVinculacion', '==', cod).where('rol', '==', 'estudiante').get();
+  return hijosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
 
-        <figure>
-            <figcaption><a href="#curso4">Español</a></figcaption>
-        </figure>
-    </article>
+async function renderHijosView() {
+  const hijos = await getHijosVinculados();
+  let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mis hijos vinculados</h3>`;
+  if (!hijos.length) html += '<p>No hay hijos vinculados aún.</p>';
+  else { for (const hijo of hijos) { html += `<div class="hijo-card"><div class="hijo-nombre">${escapeXSS(hijo.nombre)}</div><div>📧 ${hijo.email}</div><div>📚 Cursos: ${hijo.misCursos?.length || 0}</div></div>`; } }
+  html += `</div>`;
+  document.getElementById('mainContentPadre').innerHTML = html;
+}
 
-</section>
+async function renderPadrePerfilView() {
+  let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mi Perfil (Padre)</h3><div style="display:flex; align-items:center; gap:20px;"><div style="width:80px; height:80px; background:#1F5EAB; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem;">${escapeXSS(usuarioActual.nombre.charAt(0).toUpperCase())}</div><div><h3>${escapeXSS(usuarioActual.nombre)}</h3><p>${usuarioActual.email}</p><div class="codigo-box"><i class="fas fa-link"></i> Código de vinculación: <span>${usuarioActual.codigoVinculacion}</span></div></div></div></div>`;
+  document.getElementById('mainContentPadre').innerHTML = html;
+}
 
+function renderVistaPadre() {
+  const view = document.querySelector('[data-padre-view].active')?.dataset.padreView || 'hijos';
+  if (view === 'hijos') renderHijosView();
+  else if (view === 'perfil') renderPadrePerfilView();
+  document.querySelectorAll('[data-padre-view]').forEach(el => { el.classList.toggle('active', el.dataset.padreView === view); });
+}
 
-<section id="curso1">
-    <h2>Lenguaje de señas</h2>
-    <p>Actividades del curso:</p>
-    <ul>
-        <li>Aprender el abecedario</li>
-        <li>Saludos básicos</li>
-        <li>Ejercicios prácticos</li>
-    </ul>
-<p>Aqui va mi IA.</p>
-</section>
+// ========== CURSOS DESTACADOS ==========
+function cargarCursosDestacados() {
+  const grid = document.getElementById('coursesGrid');
+  if (!grid) return;
+  grid.innerHTML = cursosDisponibles.map(curso => `
+    <div class="course-card" onclick="notifier.showToast('Inicia sesión para ver el curso', 'info')">
+      <img src="${curso.imagen}" alt="${curso.nombre}">
+      <div class="course-info">
+        <h3>CURSO ${curso.nombre.toUpperCase()}</h3>
+        <p>Aprende ${curso.descripcion.toLowerCase()} de forma divertida</p>
+        <span class="badge-principiante">👥 PRINCIPIANTE</span>
+      </div>
+    </div>
+  `).join('');
+}
 
-<section id="curso2">
-    <h2>Matemáticas</h2>
-    <ul>
-        <li>Sumas</li>
-        <li>Restas</li>
-        <li>Problemas</li>
-    </ul>
-<p>Aqui va mi IA.</p>
-</section>
+// ========== FOXY - GUÍA INTERACTIVO ==========
+function initFoxy() {
+  const foxyAvatar = document.getElementById('foxy-avatar');
+  const foxyBubble = document.getElementById('foxy-bubble');
+  const closeFoxy = document.getElementById('close-foxy');
+  const foxyText = document.getElementById('foxy-text');
+  
+  if (!foxyAvatar) return;
+  
+  const mensajes = [
+    '¡Hola! Tu aventura comienza aquí 🌟',
+    'Toca las islas para aprender 🏝️',
+    '¡Sigue avanzando, campeón! 💪',
+    'Cada isla tiene un tesoro de conocimiento 📚',
+    '¡No olvides el cofre del tesoro! 🎁',
+    '¡Tú puedes lograrlo! ⭐'
+  ];
+  
+  let mensajeIndex = 0;
+  
+  foxyAvatar.addEventListener('click', function() {
+    if (foxyBubble.classList.contains('hidden')) {
+      foxyBubble.classList.remove('hidden');
+    }
+    mensajeIndex = (mensajeIndex + 1) % mensajes.length;
+    foxyText.textContent = mensajes[mensajeIndex];
+    foxyAvatar.style.transform = 'scale(1.2)';
+    setTimeout(function() {
+      foxyAvatar.style.transform = 'scale(1)';
+    }, 200);
+  });
+  
+  if (closeFoxy) {
+    closeFoxy.addEventListener('click', function(e) {
+      e.stopPropagation();
+      foxyBubble.classList.add('hidden');
+    });
+  }
+}
 
-<section id="curso3">
-    <h2>Programación</h2>
-    <ul>
-        <li>Introducción a HTML</li>
-        <li>Variables</li>
-        <li>Ejercicios</li>
-    </ul>
-<p>Aqui va mi IA.</p>
-</section>
+// ========== INICIALIZACIÓN ==========
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('btnLogin').onclick = () => document.getElementById('loginModal').classList.add('active');
+  document.getElementById('btnRegister').onclick = () => document.getElementById('registerModal').classList.add('active');
 
-<section id="curso4">
-    <h2>Español</h2>
-    <ul>
-        <li>Lectura</li>
-        <li>Escritura</li>
-        <li>Comprensión</li>
-    </ul>
-<p>Aqui va mi IA.</p>
-</section>
+  document.querySelectorAll('[data-padre-view]').forEach(el => {
+    el.addEventListener('click', () => { renderVistaPadre(); });
+  });
 
-<section id="familiar">
-    <h2>Panel del Padre de Familia</h2>
-      <h3>Iniciar sesión como padre de familia</h3>
+  cargarCursosDestacados();
+  initFoxy();
 
-<form>
-    <label>Correo del padre:</label>
-    <input type="email" name="correo_padre">
+  const savedId = localStorage.getItem('usuarioActualId');
+  if (savedId) {
+    const doc = await db.collection('usuarios').doc(savedId).get();
+    if (doc.exists) {
+      usuarioActual = { id: doc.id, ...doc.data() };
+      document.getElementById('mainScreen').style.display = 'none';
+      if (usuarioActual.rol === 'estudiante') {
+        document.getElementById('dashboardEstudiante').style.display = 'block';
+        document.getElementById('dashUserName').innerText = escapeXSS(usuarioActual.nombre);
+        setTimeout(() => {
+          const foxyBubble = document.getElementById('foxy-bubble');
+          const foxyText = document.getElementById('foxy-text');
+          if (foxyBubble && foxyText) {
+            foxyBubble.classList.remove('hidden');
+            foxyText.textContent = '¡Bienvenida ' + escapeXSS(usuarioActual.nombre) + '! Tu aventura comienza aquí 🌟';
+          }
+        }, 800);
+      } else {
+        document.getElementById('dashboardPadre').style.display = 'block';
+        document.getElementById('dashPadreUserName').innerText = escapeXSS(usuarioActual.nombre);
+        renderVistaPadre();
+      }
+    }
+  }
+});
 
-    <br><br>
+// ========== FUNCIONES GLOBALES ==========
+window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
+window.closeRegisterModal = () => document.getElementById('registerModal').classList.remove('active');
+window.switchToLogin = () => { closeRegisterModal(); document.getElementById('loginModal').classList.add('active'); };
+window.switchToRegister = () => { closeLoginModal(); document.getElementById('registerModal').classList.add('active'); };
+window.selectRole = (role) => { currentRole = role; document.querySelectorAll('.role-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.role === role); }); document.getElementById('padreFields').style.display = role === 'padre' ? 'block' : 'none'; };
+window.showLoginModal = () => document.getElementById('loginModal').classList.add('active');
+window.showRegisterModal = () => document.getElementById('registerModal').classList.add('active');
+window.encontrarCofre = () => notifier.showToast('¡Has encontrado un cofre! Pronto más recompensas', 'success');
 
-    <label>Contraseña:</label>
-    <input type="password" name="password_padre">
+// ========== SISTEMA DE NOTIFICACIONES ==========
+class NotificationSystem {
+  constructor() { this.createContainer(); }
+  createContainer() { if (!document.querySelector('.notification-container')) { const container = document.createElement('div'); container.className = 'notification-container'; document.body.appendChild(container); } }
+  showToast(message, type = 'info', duration = 3000) {
+    const container = document.querySelector('.notification-container');
+    const toast = document.createElement('div');
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    const titles = { success: 'Éxito', error: 'Error', warning: 'Advertencia', info: 'Información' };
+    toast.className = `notification notification-${type}`;
+    toast.innerHTML = `<div class="notification-icon"><i class="fas ${icons[type]}"></i></div><div class="notification-content"><div class="notification-title">${titles[type]}</div><div class="notification-message">${escapeXSS(message)}</div></div><button class="notification-close"><i class="fas fa-times"></i></button>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), duration);
+    toast.querySelector('.notification-close').onclick = () => toast.remove();
+  }
+}
+const notifier = new NotificationSystem();
 
-    <br><br>
-
-    <button>Ver información del estudiante</button>
-</form>
-
-
-    <article>
-        <h3>Progreso del estudiante</h3>
-            <article>
-        <h3>Información del estudiante</h3>
-        <p>Nombre: Lian Pérez</p>
-        <p>Edad: 9 años</p>
-    </article>
-
-    <article>
-        <h3>Progreso del estudiante</h3>
-        <p>Matemáticas: 80%</p>
-        <p>Lenguaje de señas: 60%</p>
-        <p>Programación: 40%</p>
-    </article>
-
-    <article>
-        <h3>Actividades recientes</h3>
-        <ul>
-            <li>Completó ejercicios de sumas</li>
-            <li>Aprendió el abecedario en señas</li>
-            <li>Realizó práctica de HTML</li>
-        </ul>
-    </article>
-
-    <article>
-        <h3>Tareas pendientes</h3>
-        <ul>
-            <li>Ejercicios de restas</li>
-        </ul>
-    </article>
-</section>
-
-</main>
-
-<footer>
-    <p>© 2026 Sendero del Saber</p>
-</footer>
+// ========== PARTÍCULAS DEL BOSQUE ==========
+document.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById('forestCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let particles = [], width, height;
+  class Particle {
+    constructor() { this.reset(); }
+    reset() { this.x = Math.random() * width; this.y = Math.random() * height * 0.7; this.size = Math.random() * 6 + 2.5; this.speedY = Math.random() * 1.1 + 0.5; this.speedX = Math.random() * 1.8 - 0.9; this.angle = Math.random() * Math.PI * 2; this.angleSpeed = Math.random() * 0.04 - 0.02; this.opacity = Math.random() * 0.65 + 0.35; this.hue = Math.random() < 0.65 ? 85 : 48; this.type = Math.random() < 0.75 ? 'leaf' : 'firefly'; }
+    update() { this.y += this.speedY; this.x += this.speedX; this.angle += this.angleSpeed; this.speedX += Math.sin(this.angle) * 0.012; if (this.y > height + 30) this.reset(); }
+    draw() { ctx.save(); ctx.globalAlpha = this.opacity; ctx.translate(this.x, this.y); ctx.rotate(this.angle); if (this.type === 'leaf') { ctx.fillStyle = `hsl(${this.hue}, 75%, 52%)`; ctx.beginPath(); ctx.ellipse(0, 0, this.size, this.size * 0.55, 0, 0, Math.PI * 2); ctx.fill(); } else { ctx.fillStyle = '#fffb8a'; ctx.shadowBlur = 18; ctx.shadowColor = '#ffeb3b'; ctx.beginPath(); ctx.arc(0, 0, this.size * 0.75, 0, Math.PI * 2); ctx.fill(); } ctx.restore(); }
+  }
+  function resizeCanvas() { width = canvas.offsetWidth; height = canvas.offsetHeight; canvas.width = width; canvas.height = height; }
+  function animate() { ctx.clearRect(0, 0, width, height); for (let p of particles) { p.update(); p.draw(); } requestAnimationFrame(animate); }
+  function initParticles() { particles = []; const count = window.innerWidth < 768 ? 50 : 85; for (let i = 0; i < count; i++) particles.push(new Particle()); }
+  resizeCanvas(); initParticles(); animate();
+  window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+});
+</script>
 
 </body>
 </html>
