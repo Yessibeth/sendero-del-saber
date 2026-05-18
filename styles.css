@@ -1,0 +1,1891 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0a0f2a 0%, #0f1736 50%, #0a1f3d 100%);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* LANDING PAGE */
+#mainScreen {
+  display: block;
+}
+
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 60px;
+  background: transparent;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.logo-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.logo-header span {
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.auth-links {
+  display: flex;
+  gap: 30px;
+}
+
+.auth-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 30px;
+}
+
+.auth-links a:first-child {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.auth-links a:first-child:hover {
+  border-color: #FFD700;
+  color: #FFD700;
+}
+
+.auth-links a:last-child {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1f3a;
+}
+
+.auth-links a:last-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+}
+
+.landing-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 120px 60px 80px;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  flex-wrap: wrap;
+  min-height: 70vh;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.hero-title {
+  margin-bottom: 20px;
+}
+
+.hero-title .line1 {
+  font-family: 'Gasoek One', cursive;
+  font-size: 5.5rem;
+  display: block;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, #fff, #FFD700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-title .line2 {
+  font-family: 'Gasoek One', cursive;
+  font-size: 4rem;
+  display: block;
+  color: #FFD700;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 20px;
+}
+
+.hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-image img {
+  max-width: 100%;
+  border-radius: 30px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+/* Sección EMPIEZA */
+.empieza-section {
+  padding: 60px 0;
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
+}
+
+.empieza-title {
+  font-family: 'Gasoek One', cursive;
+  font-size: 3rem;
+  color: #FFD700;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.empieza-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+  margin: 0 auto 50px;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.subject-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.subject-card:hover {
+  transform: translateY(-10px);
+  border-color: #FFD700;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.subject-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.subject-info {
+  padding: 20px;
+}
+
+.subject-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #FFD700;
+}
+
+.subject-info p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.subject-badge {
+  display: inline-block;
+  background: rgba(255, 215, 0, 0.2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #FFD700;
+  margin-top: 12px;
+}
+
+/* Sección CURSOS */
+.cursos-section {
+  padding: 60px 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.cursos-title {
+  font-family: 'Gasoek One', cursive;
+  font-size: 3rem;
+  color: #FFD700;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* Sección About */
+.about-section {
+  background: linear-gradient(135deg, #1a1a3a, #0a0f2a);
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.about-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.about-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  color: #FFD700;
+}
+
+.mission-vision {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mission, .vision {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 30px;
+  border-radius: 20px;
+  flex: 1;
+  min-width: 250px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.mission h3, .vision h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #FFD700;
+}
+
+/* Historias de éxito */
+.success-stories {
+  padding: 60px 20px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.success-stories h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #FFD700;
+}
+
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.story-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  transition: all 0.3s;
+}
+
+.story-card:hover {
+  transform: translateY(-5px);
+  border-color: #FFD700;
+}
+
+.story-card h4 {
+  color: #FFD700;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.story-card p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.story-badge {
+  display: inline-block;
+  background: rgba(255, 215, 0, 0.2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  color: #FFD700;
+  margin-top: 15px;
+}
+
+/* Footer */
+.site-footer {
+  background: #050814;
+  padding: 50px 20px 30px;
+  text-align: center;
+}
+
+.footer-title {
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 20px;
+}
+
+.social-icons a {
+  color: white;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: #FFD700;
+  transform: translateY(-3px);
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* MODALES */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1a1f3a, #0f1428);
+  padding: 40px;
+  border-radius: 30px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.close-modal {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.3s;
+}
+
+.close-modal:hover {
+  color: #FFD700;
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #FFD700;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #FFD700;
+}
+
+.role-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.role-btn.active {
+  background: #FFD700;
+  color: #1a1f3a;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+
+.modal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+}
+
+.switch-form {
+  text-align: center;
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.switch-form span {
+  color: #FFD700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* DASHBOARD GENERAL - MANTENIDO IGUAL */
+.dashboard, .dashboard-padre, .materia-view {
+  display: none;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(10, 15, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.dashboard-logo span {
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.user-info-dash {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-name {
+  font-weight: 500;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background: #d32f2f;
+}
+
+.dashboard-layout {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+.side-menu {
+  width: 260px;
+  background: rgba(10, 15, 42, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 30px 15px;
+  border-right: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.side-item {
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+}
+
+.side-item i {
+  width: 24px;
+}
+
+.side-item:hover {
+  background: rgba(255, 215, 0, 0.15);
+  transform: translateX(5px);
+}
+
+.side-item.active {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1f3a;
+}
+
+.main-content-dash {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Island cards para dashboard */
+.islands-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.islands-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.islands-header h1 {
+  font-family: 'Gasoek One', cursive;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.islands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 35px;
+  margin-bottom: 50px;
+}
+
+.island-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border-radius: 35px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.island-card:hover {
+  transform: translateY(-15px) scale(1.02);
+  border-color: #FFD700;
+  box-shadow: 0 30px 50px rgba(0, 0, 0, 0.4);
+}
+
+.island-image {
+  height: 200px;
+  overflow: hidden;
+}
+
+.island-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.island-card:hover .island-image img {
+  transform: scale(1.1);
+}
+
+.island-content {
+  padding: 25px;
+}
+
+.island-content h3 {
+  font-size: 1.4rem;
+  color: #FFD700;
+  margin-bottom: 10px;
+}
+
+.island-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.island-progress {
+  margin-bottom: 20px;
+}
+
+.progress-bar-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  width: 0%;
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.5s;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 5px;
+  display: block;
+  text-align: right;
+}
+
+.island-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-continue {
+  flex: 1;
+  padding: 10px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border: none;
+  border-radius: 25px;
+  color: #1a1f3a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-remove {
+  background: rgba(211, 47, 47, 0.2);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 25px;
+  color: #ff6b6b;
+  cursor: pointer;
+}
+
+.available-courses-section {
+  margin-top: 40px;
+}
+
+.available-courses-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #FFD700;
+}
+
+.available-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.available-course-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.add-course-btn {
+  background: #FFD700;
+  border: none;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Perfil y otros componentes */
+.perfil-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 30px;
+  padding: 30px;
+}
+
+.codigo-box {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 15px;
+  margin-top: 20px;
+  border: 1px dashed #FFD700;
+}
+
+/* Materia view */
+.btn-volver-materia {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 15px;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 12px 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 30px;
+  color: white;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1f3a;
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pregunta-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.opcion {
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.opcion.selected {
+  background: #FFD700;
+  color: #1a1f3a;
+}
+
+.textarea-practica {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  margin: 15px 0;
+}
+
+.btn-respuesta {
+  background: #FFD700;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.correcto { color: #4caf50; }
+.incorrecto { color: #f44336; }
+
+/* Dashboard padre */
+.hijo-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 15px;
+}
+
+.hijo-nombre {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #FFD700;
+}
+
+/* NOTIFICACIONES */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notification {
+  background: linear-gradient(135deg, #1a1f3a, #0f1428);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 320px;
+  max-width: 400px;
+  animation: slideInRight 0.3s ease-out;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-success .notification-icon { color: #4caf50; }
+.notification-error .notification-icon { color: #f44336; }
+.notification-warning .notification-icon { color: #ff9800; }
+.notification-info .notification-icon { color: #2196f3; }
+
+.notification-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  animation: progressShrink 4s linear forwards;
+}
+
+@keyframes progressShrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-dialog {
+  background: linear-gradient(135deg, #1a1f3a, #0f1428);
+  border-radius: 30px;
+  width: 90%;
+  max-width: 450px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.modal-dialog-header {
+  padding: 20px 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-dialog-body {
+  padding: 25px;
+}
+
+.modal-dialog-footer {
+  padding: 15px 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-btn-confirm, .modal-btn-cancel {
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-btn-confirm {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1f3a;
+}
+
+.modal-btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* ==================== NAVBAR ==================== */
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: #0a1428;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+}
+
+.logo-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+}
+
+.logo-header span 
+  {
+    font-family: "Gasoek One", cursive;
+    font-size: 1.5rem;
+    color: rgb(255, 255, 255);
+    margin-bottom: 20px;
+    letter-spacing: 4px;
+    text-shadow: rgba(0, 0, 0, 0.7) 0px 3px 15px;
+}
+
+
+/* Botones del navbar */
+.login-btn, .register-btn {
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.login-btn {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.register-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #0a1428;
+  border: none;
+}
+
+.register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+}
+
+/* ==================== BANNER PRINCIPAL - FULL SCREEN ==================== */
+.hero-banner {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;                    /* ← Full viewport width */
+  margin-left: calc(-50vw + 50%);  /* ← Centra y elimina bordes laterales */
+  margin-right: calc(-50vw + 50%);
+  background-image: 
+    linear-gradient(rgba(10, 20, 45, 0.45), rgba(10, 20, 45, 0.55)), 
+    url('images/portada-sendero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 160px 20px 100px;
+  overflow: hidden;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.banner-content {
+  max-width: 1150px;
+  z-index: 2;
+  width: 100%;
+}
+
+.banner-content {
+  max-width: 1100px;                   /* Más ancho para el contenido */
+  z-index: 2;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.banner-subtitle {
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.9rem;
+  color: #fff;
+  margin-bottom: 20px;
+  letter-spacing: 4px;
+  text-shadow: 0 3px 15px rgba(0,0,0,0.7);
+}
+
+.banner-title-image {
+  max-width: 100%;
+  width: 950px;                        /* Título más grande */
+  height: auto;
+  margin: 15px 0 35px;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.6));
+}
+
+.dashboard-title-image {
+    max-width: 320px;
+    width: 90%;
+    height: auto;
+    margin: -20px auto 10px;
+    display: block;
+    filter: drop-shadow(0 8px 25px rgba(0,0,0,0.6));
+    z-index: 5;
+}
+.banner-tagline {
+  font-size: 1.4rem;
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 45px;
+  text-shadow: 0 3px 12px rgba(0,0,0,0.6);
+}
+
+.btn-empieza {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1f3a;
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.5rem;
+  padding: 20px 70px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 35px rgba(255, 215, 0, 0.45);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.btn-empieza:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 18px 45px rgba(255, 215, 0, 0.55);
+}
+
+/* ==================== RESPONSIVE - NAVBAR Y BANNER ==================== */
+@media (max-width: 768px) {
+  .landing-header {
+    padding: 15px 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .auth-links {
+    gap: 12px;
+  }
+
+  .login-btn, .register-btn {
+    padding: 8px 16px;
+    font-size: 0.95rem;
+  }
+
+  .hero-banner {
+    padding: 120px 20px 80px;
+    min-height: 90vh;
+    background-position: center 30%;
+  }
+
+  .banner-title-image {
+    width: 85%;
+    max-width: 520px;
+    margin: 10px 0 25px;
+  }
+
+  .banner-subtitle {
+    font-size: 1.5rem;
+  }
+
+  .banner-tagline {
+    font-size: 1.1rem;
+  }
+
+  .btn-empieza {
+    padding: 16px 50px;
+    font-size: 1.3rem;
+  }
+}
+/* ==================== SECCIÓN CURSOS DESTACADOS ==================== */
+.cursos-destacados-section {
+  background: #0a1428;
+  padding: 1px 0 100px;           /* ← Reducido el padding superior */
+  margin-top: -40px;               /* ← Sube la sección */
+  position: relative;
+  border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-header h2 {
+  font-family: 'Gasoek One', cursive;
+  font-size: 2.35rem;
+  color: #fff;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.section-subtitle {
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.85);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.course-card {
+  background: #0f1b38;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 3px solid #1e2a4d;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.course-card:hover {
+  transform: translateY(-15px);
+  border-color: #FFD700;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.course-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.course-info {
+  padding: 20px;
+  text-align: center;
+}
+
+.course-info h3 {
+  color: #FFD700;
+  font-size: 1.35rem;
+  margin: 12px 0 8px;
+  font-weight: 700;
+}
+
+.course-info p {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.badge-principiante {
+  background: linear-gradient(135deg, #1a3a1a, #2e6b2e);
+  color: #a1e8a1;
+  padding: 6px 18px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #4ade80;
+}
+
+.cursos-button-container {
+  text-align: center;
+  margin-top: 60px;
+}
+
+.btn-cursos-madera {
+  background: linear-gradient(135deg, #d97706, #fbbf24);
+  color: #1a1208;
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.4rem;
+  padding: 18px 80px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(217, 119, 6, 0.4);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.btn-cursos-madera:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(251, 191, 36, 0.5);
+}
+
+/* ==================== DASHBOARD ESTUDIANTE ==================== */
+.dashboard-islas,
+#dashboardEstudiante {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background: #0a1428;
+}
+
+#dashboardEstudiante[style*="display: block"] {
+  display: flex !important;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(10, 15, 42, 0.98);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+  z-index: 100;
+}
+
+.ocean-background {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  background: url('../images/ocean-background.gif') center/cover no-repeat;
+  background-color: #0f1e3d;
+  overflow: hidden;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.6);
+}
+
+.islands-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+}
+
+.welcome-islands {
+  text-align: center;
+  margin-bottom: 50px;
+  z-index: 10;
+  position: relative;
+}
+
+.dashboard-title-image {
+  max-width: 560px !important;
+  width: 90% !important;
+  height: auto !important;
+  margin: -20px auto 10px !important;
+  display: block !important;
+  filter: drop-shadow(0 8px 25px rgba(0,0,0,0.6));
+}
+
+.dashboard-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+}
+
+.island {
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  user-select: none;
+}
+
+.island:hover {
+  transform: scale(1.18) rotate(5deg);
+  z-index: 100;
+}
+
+.island img {
+  width: 100%;
+  border-radius: 12px;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+}
+
+/* ==================== ESTILOS EXISTENTES (lo que ya tienes) ==================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ... todo tu CSS actual ... */
+
+.island {
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  user-select: none;
+}
+@media (max-width: 600px) {
+  .islands-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .island {
+    position: relative !important;
+    transform: scale(0.8);
+    margin: 0 auto;
+  }
+  
+  #isla-viento, #isla-palabra, #isla-codigo, #isla-calculo {
+    left: auto !important;
+    top: auto !important;
+    width: 200px !important;
+    margin: 0 auto;
+  }
+  
+  .chest {
+    position: relative !important;
+    margin: 20px auto;
+    display: block;
+  }
+}
+/* Solo para celular - deslizar islas */
+@media (max-width: 768px) {
+  .islands-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .island {
+    flex: 0 0 70%;
+    scroll-snap-align: center;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+  }
+  
+  .chest {
+    flex: 0 0 50%;
+    position: relative !important;
+  }
+}
+/* ==================== AQUÍ ABAJO PON EL CÓDIGO DEL BARCO ==================== */
+
+/* Posiciones de islas */
+/* Islas más abajo */
+#isla-viento    { left: 8%;  top: 58%; width: 265px; }
+#isla-palabra   { left: 29%; top: 38%; width: 245px; }
+#isla-codigo    { left: 55%; top: 62%; width: 235px; }
+#isla-calculo   { left: 68%; top: 30%; width: 275px; }
+.chest {
+  position: absolute;
+  bottom: 15%;
+  right: 12%;
+  width: 100px;
+  animation: floatChest 6.5s ease-in-out infinite;
+  cursor: pointer;
+  z-index: 50;
+}
+
+@keyframes floatChest {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+  /* Cofre */
+  .chest {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin: 60px auto 40px;
+    display: block;
+    width: 95px;
+    z-index: 2;
+  }
+
+  /* Título del dashboard */
+  .dashboard-title-image {
+    max-width: 88%;
+    margin: 0 auto 20px;
+    display: block;
+  }
+
+  .dashboard-subtitle {
+    font-size: 1.15rem;
+  }
+
+  /* Evitar que el navbar tape el contenido al hacer scroll */
+  .dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+/* Ajuste responsivo */
+@media (max-width: 768px) {
+  .dashboard-title-image {
+    max-width: 220px;        /* Tamaño de la imagen */
+    margin-top: 80px !important;  /* Baja la imagen */
+  }
+  
+  .dashboard-subtitle {
+    font-size: 1.10rem;
+  }
+}
+
+/* ==================== FOOTER ESTILO FANTASÍA ==================== */
+.site-footer {
+  background: linear-gradient(to top, #050814, #0a1428);
+  padding: 80px 20px 40px;
+  text-align: center;
+  border-top: 3px solid #FFD700;
+  position: relative;
+}
+
+.footer-content {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.footer-logo {
+  max-width: 420px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 8px 15px rgba(255, 215, 0, 0.4));
+}
+
+.footer-subtitle {
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.8rem;
+  color: #FFD700;
+  margin-bottom: 30px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  color: #ddd;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: all 0.3s;
+}
+
+.footer-nav a:hover {
+  color: #FFD700;
+  transform: translateY(-3px);
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.footer-social a {
+  font-size: 2rem;
+  color: #ccc;
+  transition: all 0.3s;
+}
+
+.footer-social a:hover {
+  color: #FFD700;
+  transform: translateY(-5px) scale(1.15);
+}
+
+.footer-copyright {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .footer-nav {
+    gap: 20px;
+    font-size: 0.95rem;
+  }
+  
+  .footer-logo {
+    max-width: 320px;
+  }
+}
+
+/* ==================== BOTÓN EMPIEZA COMO IMAGEN ==================== */
+.btn-empieza-img {
+    max-width: 170px;
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 20px 0 10px;
+    filter: drop-shadow(0 10px 25px rgba(255, 215, 0, 0.5));
+}
+
+.btn-empieza-img:hover {
+    transform: translateY(-8px) scale(1.05);
+    filter: drop-shadow(0 15px 35px rgba(255, 215, 0, 0.7));
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .btn-empieza-img {
+        max-width: 260px;
+        margin: 15px 0;
+    }
+}
+/* ==================== PARTICULAS BOSQUE ==================== */
+.forest-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .landing-header {
+    padding: 15px 20px;
+  }
+  
+  .hero-title .line1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-title .line2 {
+    font-size: 2rem;
+  }
+  
+  .landing-container {
+    padding: 100px 20px 50px;
+  }
+  
+  .empieza-title, .cursos-title {
+    font-size: 2rem;
+  }
+  
+  .dashboard-layout {
+    flex-direction: column;
+  }
+  
+  .side-menu {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  .side-item {
+    white-space: nowrap;
+  }
+  
+  .notification {
+    min-width: 280px;
+  }
+}
+/* ==================== FOXY - EL GUÍA (ESQUINA DERECHA) ==================== */
+.foxy-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.foxy-avatar {
+  width: 280px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+}
+
+.foxy-avatar:hover {
+  transform: scale(1.1);
+}
+
+/* Burbuja de texto */
+.foxy-bubble {
+  background: white;
+  border-radius: 20px;
+  padding: 12px 18px;
+  max-width: 220px;
+  position: relative;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  border: 2px solid #FFD700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Flecha de la burbuja (apuntando a Foxy) */
+.foxy-bubble::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  bottom: 15px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid white;
+}
+
+.foxy-bubble span {
+  font-size: 0.9rem;
+  color: #2c1a0e;
+  font-weight: 500;
+}
+
+.close-foxy {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #999;
+  padding: 0 5px;
+}
+
+.close-foxy:hover {
+  color: #d32f2f;
+}
+
+/* Ocultar burbuja */
+.foxy-bubble.hidden {
+  display: none;
+}
+
+/* Animación de saludo */
+@keyframes saludo {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+  75% { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.foxy-avatar.saludando {
+  animation: saludo 0.8s ease-in-out;
+}
+
+/* Animación de salto */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.foxy-avatar.feliz {
+  animation: bounce 0.5s ease;
+}
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+  .foxy-avatar {
+    width: 40px;
+  }
+  
+  .foxy-bubble {
+    max-width: 120px;
+    padding: 5px 8px;
+  }
+  
+  .foxy-bubble span {
+    font-size: 0.55rem;
+  }
+  .close-foxy {
+    font-size: 0.6rem !important;
+  }
+   .foxy-bubble::after {
+    right: -8px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid white;
+}
+}
+/* Forzar que Foxy y su burbuja se vean correctamente */
+#foxy-guide {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+#foxy-avatar {
+  width: 180px !important;
+  height: auto !important;
+  cursor: pointer !important;
+  order: 2 !important;  /* Foxy a la derecha */
+}
+
+#foxy-bubble {
+  background: white !important;
+  border-radius: 20px !important;
+  padding: 10px 15px !important;
+  max-width: 250px !important;
+  position: relative !important;
+  border: 2px solid #FFD700 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  order: 1 !important;  /* Burbuja a la izquierda */
+}
+
+#foxy-bubble::after {
+  content: '' !important;
+  position: absolute !important;
+  right: -10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-top: 10px solid transparent !important;
+  border-bottom: 10px solid transparent !important;
+  border-left: 10px solid white !important;
+}
+
+#foxy-text {
+  color: #2c1a0e !important;
+  font-size: 0.9rem !important;
+}
+
+#close-foxy {
+  background: none !important;
+  border: none !important;
+  font-size: 1rem !important;
+  cursor: pointer !important;
+  color: #999 !important;
+}
+
+#foxy-bubble.hidden {
+  display: none !important;
+}
