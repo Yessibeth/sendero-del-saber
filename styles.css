@@ -789,6 +789,9 @@ body {
   color: white;
   cursor: pointer;
   margin-bottom: 30px;
+  margin-top: 80px; /* ← agrega esta línea */
+  display: block;
+
 }
 
 .tabs-container {
@@ -1888,4 +1891,343 @@ body {
 
 #foxy-bubble.hidden {
   display: none !important;
+}
+/* ==================== FIX MÓVIL - ISLAS Y FOXY ==================== */
+/* Pega esto al FINAL de tu styles.css */
+
+@media (max-width: 768px) {
+
+  /* --- HEADER DEL DASHBOARD --- */
+  .dashboard-header {
+    padding: 10px 15px;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .dashboard-logo span {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+  }
+
+  .dashboard-logo img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .user-name {
+    font-size: 0.85rem;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .logout-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  /* --- FOXY MÁS PEQUEÑO --- */
+  #foxy-avatar {
+    width: 100px !important;
+  }
+
+  #foxy-bubble {
+    max-width: 160px !important;
+    padding: 8px 10px !important;
+  }
+
+  #foxy-text {
+    font-size: 0.75rem !important;
+  }
+
+  /* --- ISLAS EN COLUMNA DESLIZABLE --- */
+  .ocean-background {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .islands-container {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 20px !important;
+    padding: 10px 20px 120px !important;
+    overflow-x: unset !important;
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
+  /* Título del dashboard */
+  .dashboard-title-image {
+    max-width: 260px !important;
+    width: 85% !important;
+    margin: 10px auto 5px !important;
+  }
+
+  /* Todas las islas en posición normal (no absoluta) */
+  #isla-viento,
+  #isla-palabra,
+  #isla-codigo,
+  #isla-calculo {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 200px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+  }
+
+  /* Hover en móvil más sutil */
+  .island:hover {
+    transform: scale(1.08) !important;
+  }
+
+  /* Cofre */
+  .chest {
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    margin: 10px auto !important;
+    display: block !important;
+    width: 80px !important;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 400px) {
+  #isla-viento,
+  #isla-palabra,
+  #isla-codigo,
+  #isla-calculo {
+    width: 160px !important;
+  }
+
+  #foxy-avatar {
+    width: 80px !important;
+  }
+
+  .dashboard-logo span {
+    display: none;
+  }
+}
+body.padre-activo #mainScreen {
+  display: none !important;
+}
+/* Oculta la página principal cuando el padre está logueado */
+body.padre-activo #mainScreen {
+    display: none !important;
+}
+/* Forzar ocultar página principal cuando el padre está activo */
+body.padre-activo #mainScreen {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Forzar mostrar panel del padre */
+body.padre-activo #dashboardPadre {
+    display: block !important;
+}
+/* ========== PARA PADRE ========== */
+body.padre-activo #mainScreen,
+body.padre-activo .cursos-destacados-section,
+body.padre-activo .success-stories,
+body.padre-activo .about-section,
+body.padre-activo footer {
+    display: none !important;
+}
+
+body.padre-activo #dashboardPadre {
+    display: block !important;
+}
+
+/* ========== PARA ESTUDIANTE ========== */
+body.estudiante-activo #mainScreen,
+body.estudiante-activo .cursos-destacados-section,
+body.estudiante-activo .success-stories,
+body.estudiante-activo .about-section,
+body.estudiante-activo footer {
+    display: none !important;
+}
+
+body.estudiante-activo #dashboardEstudiante {
+    display: block !important;
+}
+/* ========== OCULTAR PANTALLA PRINCIPAL AL LOGUEARSE ========== */
+body.padre-activo #mainScreen,
+body.padre-activo #contacto {
+    display: none !important;
+}
+
+body.padre-activo #dashboardPadre {
+    display: block !important;
+}
+
+body.estudiante-activo #mainScreen,
+body.estudiante-activo #contacto {
+    display: none !important;
+}
+
+body.estudiante-activo #dashboardEstudiante {
+    display: flex !important;
+}
+/* ==================== FIX PRINCIPAL ==================== */
+.hero-banner {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 100px;           /* espacio para header fijo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* Hacemos que los cursos queden dentro del hero */
+.cursos-destacados-section {
+  background: transparent;
+  padding: 40px 20px 80px;
+  margin-top: 0;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.landing-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Ajuste de las cards para que se vean como en la imagen */
+.course-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-card img {
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Historias de éxito - lado derecho */
+.success-stories {
+  padding: 80px 20px;
+  background: #0a1428;
+}
+
+.stories-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+/* Título grande de cursos */
+.section-header h2 {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .hero-banner {
+    padding-top: 80px;
+    min-height: auto;
+  }
+  
+  .banner-title-image {
+    width: 85%;
+    max-width: 700px;
+  }
+}
+/* ==================== HERO BANNER - IMAGEN SOLO AL PRINCIPIO ==================== */
+.hero-banner {
+  position: relative;
+  min-height: 85vh;           /* Reducido para que no sea tan grande */
+  width: 100%;
+  background-image: 
+    linear-gradient(rgba(10, 20, 45, 0.45), rgba(10, 20, 45, 0.65)), 
+    url('images/portada-sendero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 140px 20px 100px;   /* Ajusta según necesites */
+  overflow: hidden;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  padding: 0 20px;
+}
+
+/* Sección de cursos debajo (sin fondo grande) */
+.cursos-destacados-section {
+  background: #0a1428;           /* Fondo oscuro normal */
+  padding: 80px 20px 100px;
+  margin-top: -60px;             /* Une visualmente con el hero */
+  position: relative;
+  z-index: 3;
+  border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+/* Ajustes del título del hero */
+.banner-title-image {
+  max-width: 920px;
+  width: 90%;
+  height: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-banner {
+    min-height: 70vh;
+    padding: 110px 20px 80px;
+  }
+  
+  .banner-title-image {
+    max-width: 580px;
+  }
+}
+/* ========== AJUSTE IMÁGENES HISTORIAS DE ÉXITO ========== */
+.story-card img {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin: 0 auto 15px auto;
+  display: block;
+  border: 3px solid #FFD700;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Opcional: ajusta el tamaño en móviles */
+@media (max-width: 768px) {
+  .story-card img {
+    width: 60px;
+    height: 60px;
+  }
+}
+/* ========== ALTERNATIVA: BAJAR SOLO EL CONTENIDO ========== */
+#dashboardPadre .main-content-dash {
+    padding-top: 80px !important;
+}
+
+#dashboardPadre .side-menu {
+    margin-top: 90px;
 }
