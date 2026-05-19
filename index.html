@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Sendero del Saber | Plataforma Educativa con Firebase</title>
+  <title>Sendero del Saber | Plataforma Educativa con Supabase</title>
   <link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <!-- ✅ SUPABASE (reemplaza Firebase) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -210,20 +211,42 @@
 </div>
 
 <script>
-// ========== CONFIGURACIÓN FIREBASE ==========
-const firebaseConfig = {
-  apiKey: "AIzaSyDENMbhhvQY21y7rCV7r2-T8ewXy0Jg2N8",
-  authDomain: "sendero-del-saber.firebaseapp.com",
-  projectId: "sendero-del-saber"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// ========== CONFIGURACIÓN SUPABASE (reemplaza Firebase) ==========
+// ⚠️ Reemplaza estos valores con los de tu proyecto en https://supabase.com/dashboard
+const SUPABASE_URL = 'https://qxwjuevahjrdtvtylexj.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_N7ZF6WW1hC_Ncpc9-7WHSw_XRjM_qi6';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/*
+  ============================================================
+  TABLA REQUERIDA EN SUPABASE (ejecuta esto en el SQL Editor):
+  ============================================================
+
+  create table usuarios (
+    id uuid default gen_random_uuid() primary key,
+    nombre text not null,
+    email text not null unique,
+    password text not null,
+    rol text not null check (rol in ('estudiante', 'padre')),
+    codigo_vinculacion text,
+    mis_cursos text[] default '{}',
+    created_at timestamptz default now()
+  );
+
+  -- Índices para búsquedas frecuentes
+  create index on usuarios (email);
+  create index on usuarios (codigo_vinculacion);
+
+  ============================================================
+*/
 
 // ========== VARIABLES GLOBALES ==========
 let usuarioActual = null;
 let currentRole = 'estudiante';
 let materiaActual = null;
-let tabActual = 'videso';
+let tabActual = 'video';
 let opcionesSeleccionadas = {};
 
 // ========== DATOS DE CURSOS ==========
@@ -238,7 +261,7 @@ const materiasData = {
   1: { nombre: 'Español', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Identifica el sustantivo', descripcion: 'Escribe 5 sustantivos que encuentres en tu casa.' }], ejercicios: [{ id: 1, pregunta: '¿Cuál es la definición de sustantivo?', opciones: ['Una acción', 'Personas, animales o cosas', 'Una característica', 'Un lugar'], correcta: 1 }] },
   2: { nombre: 'Programación', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Tu primer código', descripcion: 'Escribe "Hola Mundo" en el editor.' }], ejercicios: [{ id: 1, pregunta: '¿Qué significa HTML?', opciones: ['Hyper Text Markup Language', 'High Tech Language', 'Home Tool Language', 'Hyper Make Language'], correcta: 0 }] },
   3: { nombre: 'Matemáticas', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Sumas básicas', descripcion: 'Resuelve: 15 + 27 = ?' }], ejercicios: [{ id: 1, pregunta: '¿Cuánto es 5 x 6?', opciones: ['25', '30', '35', '40'], correcta: 1 }] },
-  4: { nombre: 'Lenguaje de señas', videoUrl: 'videos/lenguaje-senas.mp4', practicas: [{ id: 1, titulo: 'Alfabeto manual', descripcion: 'Practica las señas de las letras A, B, C.' }], ejercicios: [{ id: 1, pregunta: '¿Para quién es importante la comunicación por señas?', opciones: ['Personas con discapacidad auditiva', 'Solo niños', 'Solo en la escuela', 'No es importante'], correcta: 0 }] }
+  4: { nombre: 'Lenguaje de señas', videoUrl: 'videos/lenguaje-senas.mp4', ABC: [{ id: 1, titulo: 'Alfabeto manual', descripcion: 'Practica las señas de las letras A, B, C.' }], ejercicios: [{ id: 1, pregunta: '¿Para quién es importante la comunicación por señas?', opciones: ['Personas con discapacidad auditiva', 'Solo niños', 'Solo en la escuela', 'No es importante'], correcta: 0 }] }
 };
 
 // ========== FUNCIONES AUXILIARES ==========
@@ -264,30 +287,56 @@ async function registrarUsuario() {
   if (password.length < 6) { notifier.showToast('La contraseña debe tener al menos 6 caracteres', 'warning'); return; }
 
   try {
-    const existing = await db.collection('usuarios').where('email', '==', email).get();
-    if (!existing.empty) { notifier.showToast('Ya existe una cuenta con este correo', 'error'); return; }
+    // Verificar si el email ya existe
+    const { data: existing } = await db
+      .from('usuarios')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existing) { notifier.showToast('Ya existe una cuenta con este correo', 'error'); return; }
+
     if (rol === 'padre' && !codigoPadre) { notifier.showToast('Ingresa el código de vinculación', 'warning'); return; }
 
     let codigoVinculacion = null;
+
     if (rol === 'estudiante') {
+      // Generar código único para el estudiante
       codigoVinculacion = generarCodigoUnico();
       let existe = true;
       while (existe) {
-        const check = await db.collection('usuarios').where('codigoVinculacion', '==', codigoVinculacion).get();
-        if (check.empty) existe = false;
+        const { data: check } = await db
+          .from('usuarios')
+          .select('id')
+          .eq('codigo_vinculacion', codigoVinculacion)
+          .maybeSingle();
+        if (!check) existe = false;
         else codigoVinculacion = generarCodigoUnico();
       }
     } else {
-      const estudianteSnap = await db.collection('usuarios').where('codigoVinculacion', '==', codigoPadre).where('rol', '==', 'estudiante').get();
-      if (estudianteSnap.empty) { notifier.showToast('Código inválido', 'error'); return; }
+      // Validar código del estudiante
+      const { data: estudianteSnap } = await db
+        .from('usuarios')
+        .select('id')
+        .eq('codigo_vinculacion', codigoPadre)
+        .eq('rol', 'estudiante')
+        .maybeSingle();
+
+      if (!estudianteSnap) { notifier.showToast('Código inválido', 'error'); return; }
       codigoVinculacion = codigoPadre;
     }
 
-    await db.collection('usuarios').add({
-      nombre, email, password, rol, codigoVinculacion,
-      misCursos: [],
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    // Insertar nuevo usuario
+    const { error } = await db.from('usuarios').insert({
+      nombre,
+      email,
+      password,   // ⚠️ En producción usa hashing (bcrypt) + Supabase Auth
+      rol,
+      codigo_vinculacion: codigoVinculacion,
+      mis_cursos: []
     });
+
+    if (error) throw error;
 
     notifier.showToast(rol === 'estudiante' ? `Registro exitoso. Código: ${codigoVinculacion}` : 'Registro exitoso', 'success');
     closeRegisterModal();
@@ -302,10 +351,17 @@ async function iniciarSesion() {
   if (!email || !password) { notifier.showToast('Completa todos los campos', 'warning'); return; }
 
   try {
-    const usuariosSnap = await db.collection('usuarios').where('email', '==', email).where('password', '==', password).get();
-    if (usuariosSnap.empty) { notifier.showToast('Credenciales incorrectas', 'error'); return; }
+    const { data: usuario, error } = await db
+      .from('usuarios')
+      .select('*')
+      .eq('email', email)
+      .eq('password', password)
+      .maybeSingle();
 
-    usuarioActual = { id: usuariosSnap.docs[0].id, ...usuariosSnap.docs[0].data() };
+    if (error) throw error;
+    if (!usuario) { notifier.showToast('Credenciales incorrectas', 'error'); return; }
+
+    usuarioActual = usuario;
     localStorage.setItem('usuarioActualId', usuarioActual.id);
     closeLoginModal();
     document.getElementById('mainScreen').style.display = 'none';
@@ -313,7 +369,6 @@ async function iniciarSesion() {
     if (usuarioActual.rol === 'estudiante') {
       document.getElementById('dashboardEstudiante').style.display = 'block';
       document.getElementById('dashUserName').innerText = escapeXSS(usuarioActual.nombre);
-      // Mostrar bienvenida de Foxy
       setTimeout(() => {
         const foxyBubble = document.getElementById('foxy-bubble');
         const foxyText = document.getElementById('foxy-text');
@@ -381,22 +436,25 @@ function cerrarSesionDesdeMateria() { volverAlDashboard(); cerrarSesion(); }
 // ========== FUNCIONES PADRE ==========
 async function getHijosVinculados() {
   if (!usuarioActual || usuarioActual.rol !== 'padre') return [];
-  const cod = usuarioActual.codigoVinculacion;
-  const hijosSnap = await db.collection('usuarios').where('codigoVinculacion', '==', cod).where('rol', '==', 'estudiante').get();
-  return hijosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const { data: hijos } = await db
+    .from('usuarios')
+    .select('*')
+    .eq('codigo_vinculacion', usuarioActual.codigo_vinculacion)
+    .eq('rol', 'estudiante');
+  return hijos || [];
 }
 
 async function renderHijosView() {
   const hijos = await getHijosVinculados();
   let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mis hijos vinculados</h3>`;
   if (!hijos.length) html += '<p>No hay hijos vinculados aún.</p>';
-  else { for (const hijo of hijos) { html += `<div class="hijo-card"><div class="hijo-nombre">${escapeXSS(hijo.nombre)}</div><div>📧 ${hijo.email}</div><div>📚 Cursos: ${hijo.misCursos?.length || 0}</div></div>`; } }
+  else { for (const hijo of hijos) { html += `<div class="hijo-card"><div class="hijo-nombre">${escapeXSS(hijo.nombre)}</div><div>📧 ${hijo.email}</div><div>📚 Cursos: ${hijo.mis_cursos?.length || 0}</div></div>`; } }
   html += `</div>`;
   document.getElementById('mainContentPadre').innerHTML = html;
 }
 
 async function renderPadrePerfilView() {
-  let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mi Perfil (Padre)</h3><div style="display:flex; align-items:center; gap:20px;"><div style="width:80px; height:80px; background:#1F5EAB; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem;">${escapeXSS(usuarioActual.nombre.charAt(0).toUpperCase())}</div><div><h3>${escapeXSS(usuarioActual.nombre)}</h3><p>${usuarioActual.email}</p><div class="codigo-box"><i class="fas fa-link"></i> Código de vinculación: <span>${usuarioActual.codigoVinculacion}</span></div></div></div></div>`;
+  let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mi Perfil (Padre)</h3><div style="display:flex; align-items:center; gap:20px;"><div style="width:80px; height:80px; background:#1F5EAB; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem;">${escapeXSS(usuarioActual.nombre.charAt(0).toUpperCase())}</div><div><h3>${escapeXSS(usuarioActual.nombre)}</h3><p>${usuarioActual.email}</p><div class="codigo-box"><i class="fas fa-link"></i> Código de vinculación: <span>${usuarioActual.codigo_vinculacion}</span></div></div></div></div>`;
   document.getElementById('mainContentPadre').innerHTML = html;
 }
 
@@ -436,7 +494,7 @@ function initFoxy() {
     '¡Hola! Tu aventura comienza aquí 🌟',
     'Toca las islas para aprender 🏝️',
     '¡Sigue avanzando, campeón! 💪',
-    'Cada isla tiene un tesoro de conocimiento 📚',
+    'Cada ises un sendero nuevo 📚',
     '¡No olvides el cofre del tesoro! 🎁',
     '¡Tú puedes lograrlo! ⭐'
   ];
@@ -475,11 +533,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   cargarCursosDestacados();
   initFoxy();
 
+  // Restaurar sesión desde localStorage
   const savedId = localStorage.getItem('usuarioActualId');
   if (savedId) {
-    const doc = await db.collection('usuarios').doc(savedId).get();
-    if (doc.exists) {
-      usuarioActual = { id: doc.id, ...doc.data() };
+    const { data: usuario } = await db
+      .from('usuarios')
+      .select('*')
+      .eq('id', savedId)
+      .maybeSingle();
+
+    if (usuario) {
+      usuarioActual = usuario;
       document.getElementById('mainScreen').style.display = 'none';
       if (usuarioActual.rol === 'estudiante') {
         document.getElementById('dashboardEstudiante').style.display = 'block';
@@ -529,7 +593,7 @@ class NotificationSystem {
 }
 const notifier = new NotificationSystem();
 
-// ========== PARTÍCULAS DEL BOSQUE ==========
+// ========== PARTÍCULAS DEL BOSQUE (sin cambios) ==========
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('forestCanvas');
   if (!canvas) return;
