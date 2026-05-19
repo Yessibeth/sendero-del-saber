@@ -7,12 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
-
   <!-- ✅ SUPABASE (reemplaza Firebase) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
 <!-- ==================== LANDING PAGE COMPLETA ==================== -->
 <div id="mainScreen">
   <div class="landing-header">
@@ -25,7 +23,8 @@
     </div>
   </div>
 
-  <div class="landing-container">
+<div id="inicio" class="landing-container"> 
+  </div>
     <div class="hero-banner">
       <canvas id="forestCanvas" class="forest-canvas"></canvas>
       <div class="banner-content">
@@ -37,7 +36,7 @@
     </div>
   </div>
 
-  <div class="cursos-destacados-section">
+<div id="cursos" class="cursos-destacados-section">
     <div class="landing-container">
       <div class="section-header">
         <h2>APRENDE CON CURSOS DIVERTIDOS E INTERACTIVOS</h2>
@@ -54,21 +53,23 @@
     <div class="stories-container">
       <h2>HISTORIAS DE ÉXITO DE NUESTROS ALUMNOS</h2>
       <div class="stories-grid">
-        <div class="story-card">
-          <h4>CURSO LENGUAJE DE SEÑAS</h4>
-          <p>Aprende lenguaje de señas de forma divertida, promoviendo la inclusión y la comunicación...</p>
-          <span class="story-badge">PRINCIPIANTE</span>
-        </div>
-        <div class="story-card">
-          <h4>CURSO MATEMÁTICAS</h4>
-          <p>Domina las matemáticas con métodos interactivos y ejercicios prácticos para todos los niveles...</p>
-          <span class="story-badge">PRINCIPIANTE</span>
-        </div>
-      </div>
+  <div class="story-card">
+    <img src="images/Genesis.jpg" alt="Alumno" style="width:100%; height:210px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
+    <h4>CURSO LENGUAJE DE SEÑAS</h4>
+    <p>Ame al personaje del zorrito, me gusto los videos y que todo sea pirata...</p>
+    <span class="story-badge">PRINCIPIANTE</span>
+  </div>
+  <div class="story-card">
+    <img src="images/mia.jpg" alt="Alumno" style="width:100%; height:210px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
+    <h4>CURSO MATEMÁTICAS</h4>
+    <p>esta divertida la propuesta de este sitio web, es muy dinamico...</p>
+    <span class="story-badge">PRINCIPIANTE</span>
+  </div>
+</div>
     </div>
   </div>
 
-  <div class="about-section">
+  <div id="acerca" class="about-section">
     <div class="about-container">
       <h2>Acerca de</h2>
       <div class="mission-vision">
@@ -83,28 +84,27 @@
       </div>
     </div>
   </div>
-
-  <footer class="site-footer">
+</div> <!-- ← cierre de mainScreen -->
+<footer id="contacto" class="site-footer">
     <div class="footer-content">
       <img src="images/sendero-del-saber-title.png" alt="SENDERO del SABER" class="footer-logo">
       <p class="footer-subtitle">FIN DEL SENDERO</p>
       <nav class="footer-nav">
-        <a href="#">INICIO</a>
-        <a href="#">CURSOS</a>
-        <a href="#">ACERCA DE</a>
-        <a href="#">CONTACTANOS</a>
+        <a href="#inicio">INICIO</a>
+        <a href="#cursos">CURSOS</a>
+        <a href="#acerca">ACERCA DE</a>
+        <a href="mailto:ysenderodelsaber@gmail.com">CONTÁCTANOS</a>
       </nav>
       <div class="footer-social">
-        <a href="#"><i class="fab fa-youtube"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-pinterest"></i></a>
-        <a href="#"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.youtube.com/@Facuinform%C3%A1tica/videos" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.instagram.com/ye_sendero_saber?igsh=bDFhcG5pN3c1YXF0" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://pin.it/4XymQlj7B" target="_blank"><i class="fab fa-pinterest"></i></a>
+        <a href="https://wa.me/50763912222" target="_blank"><i class="fab fa-whatsapp"></i></a>
       </div>
       <div class="footer-copyright">© 2026 SENDERO DEL SABER - CRECE, APRENDE Y SIGUE AVANZANDO, PERO SIEMPRE A TU RITMO.</div>
     </div>
-  </footer>
-</div>
-
+</footer>
+</div> <!-- cierre de mainScreen -->
 <!-- ==================== MODALES ==================== -->
 <div id="registerModal" class="modal">
   <div class="modal-content">
@@ -136,7 +136,6 @@
     <div class="switch-form">¿No tienes cuenta? <span onclick="switchToRegister()">Regístrate</span></div>
   </div>
 </div>
-
 <!-- ==================== DASHBOARD ESTUDIANTE ==================== -->
 <div id="dashboardEstudiante" class="dashboard-islas" style="display: none;">
   <div class="dashboard-header">
@@ -182,7 +181,6 @@
     </div>
   </div>
 </div>
-
 <!-- ==================== DASHBOARD PADRE ==================== -->
 <div id="dashboardPadre" class="dashboard-padre" style="display: none;">
   <div class="dashboard-header">
@@ -197,7 +195,6 @@
     <div class="main-content-dash" id="mainContentPadre"><div class="loading">Cargando...</div></div>
   </div>
 </div>
-
 <!-- ==================== VISTA MATERIA ==================== -->
 <div id="materiaView" class="materia-view" style="display: none;">
   <div class="dashboard-header">
@@ -218,7 +215,6 @@ const SUPABASE_ANON_KEY = 'sb_publishable_N7ZF6WW1hC_Ncpc9-7WHSw_XRjM_qi6';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 /*
   ============================================================
   TABLA REQUERIDA EN SUPABASE (ejecuta esto en el SQL Editor):
@@ -234,21 +230,17 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     mis_cursos text[] default '{}',
     created_at timestamptz default now()
   );
-
   -- Índices para búsquedas frecuentes
   create index on usuarios (email);
   create index on usuarios (codigo_vinculacion);
-
   ============================================================
 */
-
 // ========== VARIABLES GLOBALES ==========
 let usuarioActual = null;
 let currentRole = 'estudiante';
 let materiaActual = null;
 let tabActual = 'video';
 let opcionesSeleccionadas = {};
-
 // ========== DATOS DE CURSOS ==========
 const cursosDisponibles = [
   { id: 1, nombre: 'Español', descripcion: 'Literatura, gramática y ortografía', imagen: 'images/espanol.jpg' },
@@ -261,9 +253,8 @@ const materiasData = {
   1: { nombre: 'Español', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Identifica el sustantivo', descripcion: 'Escribe 5 sustantivos que encuentres en tu casa.' }], ejercicios: [{ id: 1, pregunta: '¿Cuál es la definición de sustantivo?', opciones: ['Una acción', 'Personas, animales o cosas', 'Una característica', 'Un lugar'], correcta: 1 }] },
   2: { nombre: 'Programación', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Tu primer código', descripcion: 'Escribe "Hola Mundo" en el editor.' }], ejercicios: [{ id: 1, pregunta: '¿Qué significa HTML?', opciones: ['Hyper Text Markup Language', 'High Tech Language', 'Home Tool Language', 'Hyper Make Language'], correcta: 0 }] },
   3: { nombre: 'Matemáticas', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', practicas: [{ id: 1, titulo: 'Sumas básicas', descripcion: 'Resuelve: 15 + 27 = ?' }], ejercicios: [{ id: 1, pregunta: '¿Cuánto es 5 x 6?', opciones: ['25', '30', '35', '40'], correcta: 1 }] },
-  4: { nombre: 'Lenguaje de señas', videoUrl: 'videos/lenguaje-senas.mp4', ABC: [{ id: 1, titulo: 'Alfabeto manual', descripcion: 'Practica las señas de las letras A, B, C.' }], ejercicios: [{ id: 1, pregunta: '¿Para quién es importante la comunicación por señas?', opciones: ['Personas con discapacidad auditiva', 'Solo niños', 'Solo en la escuela', 'No es importante'], correcta: 0 }] }
+  4: { nombre: 'Lenguaje de señas', videoUrl: 'videos/lenguaje-senas.mp4', ABC: [{ id: 1, titulo: 'Alfabeto manual', descripcion: 'Practica las señas de las letras A, B, C.' }] }
 };
-
 // ========== FUNCIONES AUXILIARES ==========
 function escapeXSS(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
 
@@ -274,7 +265,6 @@ function generarCodigoUnico() {
   for (let i = 0; i < 4; i++) p2 += Math.floor(Math.random() * 10);
   return `SEN-${p1}-${p2}`;
 }
-
 // ========== REGISTRO ==========
 async function registrarUsuario() {
   const nombre = document.getElementById('regNombre').value.trim();
@@ -325,7 +315,6 @@ async function registrarUsuario() {
       if (!estudianteSnap) { notifier.showToast('Código inválido', 'error'); return; }
       codigoVinculacion = codigoPadre;
     }
-
     // Insertar nuevo usuario
     const { error } = await db.from('usuarios').insert({
       nombre,
@@ -343,7 +332,23 @@ async function registrarUsuario() {
     showLoginModal();
   } catch (error) { alert('Error: ' + error.message); }
 }
+// ========== MOSTRAR SOLO UNA PANTALLA ==========
+function mostrarSoloDashboard(rolDashboard) {
+  document.getElementById('mainScreen').style.display = 'none';
+  document.getElementById('dashboardEstudiante').style.display = 'none';
+  document.getElementById('dashboardPadre').style.display = 'none';
+  document.getElementById('materiaView').style.display = 'none';
+  
+  if (rolDashboard === 'estudiante') {
+    document.getElementById('dashboardEstudiante').style.display = 'block';
+  } else if (rolDashboard === 'padre') {
+    document.getElementById('dashboardPadre').style.display = 'block';
+  } else if (rolDashboard === 'main') {
+    document.getElementById('mainScreen').style.display = 'block';
+  }
+}
 
+// ========== INICIAR SESIÓN ==========
 // ========== INICIAR SESIÓN ==========
 async function iniciarSesion() {
   const email = document.getElementById('loginEmail').value.trim();
@@ -364,10 +369,9 @@ async function iniciarSesion() {
     usuarioActual = usuario;
     localStorage.setItem('usuarioActualId', usuarioActual.id);
     closeLoginModal();
-    document.getElementById('mainScreen').style.display = 'none';
+    mostrarSoloDashboard(usuarioActual.rol);
 
     if (usuarioActual.rol === 'estudiante') {
-      document.getElementById('dashboardEstudiante').style.display = 'block';
       document.getElementById('dashUserName').innerText = escapeXSS(usuarioActual.nombre);
       setTimeout(() => {
         const foxyBubble = document.getElementById('foxy-bubble');
@@ -378,23 +382,20 @@ async function iniciarSesion() {
         }
       }, 800);
     } else {
-      document.getElementById('dashboardPadre').style.display = 'block';
       document.getElementById('dashPadreUserName').innerText = escapeXSS(usuarioActual.nombre);
+      document.body.classList.add('padre-activo');
       renderVistaPadre();
     }
+
   } catch (error) { alert('Error: ' + error.message); }
 }
-
 // ========== CERRAR SESIÓN ==========
 async function cerrarSesion() {
   usuarioActual = null;
   localStorage.removeItem('usuarioActualId');
-  document.getElementById('dashboardEstudiante').style.display = 'none';
-  document.getElementById('dashboardPadre').style.display = 'none';
-  document.getElementById('materiaView').style.display = 'none';
-  document.getElementById('mainScreen').style.display = 'block';
+  document.body.classList.remove('padre-activo');
+  mostrarSoloDashboard('main');
 }
-
 // ========== FUNCIONES ESTUDIANTE ==========
 function abrirMateria(cursoId) {
   materiaActual = materiasData[cursoId];
@@ -432,7 +433,6 @@ window.verificarRespuesta = (id) => { const ej = materiaActual.ejercicios.find(e
 
 function volverAlDashboard() { document.getElementById('materiaView').style.display = 'none'; document.getElementById('dashboardEstudiante').style.display = 'block'; }
 function cerrarSesionDesdeMateria() { volverAlDashboard(); cerrarSesion(); }
-
 // ========== FUNCIONES PADRE ==========
 async function getHijosVinculados() {
   if (!usuarioActual || usuarioActual.rol !== 'padre') return [];
@@ -447,8 +447,26 @@ async function getHijosVinculados() {
 async function renderHijosView() {
   const hijos = await getHijosVinculados();
   let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mis hijos vinculados</h3>`;
-  if (!hijos.length) html += '<p>No hay hijos vinculados aún.</p>';
-  else { for (const hijo of hijos) { html += `<div class="hijo-card"><div class="hijo-nombre">${escapeXSS(hijo.nombre)}</div><div>📧 ${hijo.email}</div><div>📚 Cursos: ${hijo.mis_cursos?.length || 0}</div></div>`; } }
+  
+  if (!hijos.length) {
+    html += '<p>No hay hijos vinculados aún.</p>';
+  } else {
+    for (const hijo of hijos) {
+      const islas = hijo.islas_desbloqueadas || [];
+      const nombresIslas = { 1: 'Isla Palabra Perdida', 2: 'Isla Código Escondido', 3: 'Isla Cálculo Eterno', 4: 'Isla Señales Al Viento' };
+      const islasTexto = islas.length ? islas.map(i => nombresIslas[i]).join(', ') : 'Lenguaje de señas';
+      const horas = Math.floor((hijo.tiempo_total_minutos || 0) / 60);
+      const minutos = (hijo.tiempo_total_minutos || 0) % 60;
+
+      html += `
+        <div class="hijo-card">
+          <div class="hijo-nombre">${escapeXSS(hijo.nombre)}</div>
+          <div>📧 ${hijo.email}</div>
+          <div>🏝️ Islas visitadas: ${islasTexto}</div>
+          <div>⏱️ Tiempo en la plataforma: ${horas}h ${minutos}m</div>
+        </div>`;
+    }
+  }
   html += `</div>`;
   document.getElementById('mainContentPadre').innerHTML = html;
 }
@@ -464,7 +482,6 @@ function renderVistaPadre() {
   else if (view === 'perfil') renderPadrePerfilView();
   document.querySelectorAll('[data-padre-view]').forEach(el => { el.classList.toggle('active', el.dataset.padreView === view); });
 }
-
 // ========== CURSOS DESTACADOS ==========
 function cargarCursosDestacados() {
   const grid = document.getElementById('coursesGrid');
@@ -480,7 +497,6 @@ function cargarCursosDestacados() {
     </div>
   `).join('');
 }
-
 // ========== FOXY - GUÍA INTERACTIVO ==========
 function initFoxy() {
   const foxyAvatar = document.getElementById('foxy-avatar');
@@ -520,7 +536,6 @@ function initFoxy() {
     });
   }
 }
-
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btnLogin').onclick = () => document.getElementById('loginModal').classList.add('active');
@@ -532,7 +547,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   cargarCursosDestacados();
   initFoxy();
-
   // Restaurar sesión desde localStorage
   const savedId = localStorage.getItem('usuarioActualId');
   if (savedId) {
@@ -544,7 +558,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (usuario) {
       usuarioActual = usuario;
-      document.getElementById('mainScreen').style.display = 'none';
+      document.getElementById('mainScreen').style.display = 'none'; // ← ya está
       if (usuarioActual.rol === 'estudiante') {
         document.getElementById('dashboardEstudiante').style.display = 'block';
         document.getElementById('dashUserName').innerText = escapeXSS(usuarioActual.nombre);
@@ -559,12 +573,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         document.getElementById('dashboardPadre').style.display = 'block';
         document.getElementById('dashPadreUserName').innerText = escapeXSS(usuarioActual.nombre);
+        document.body.classList.add('padre-activo');
         renderVistaPadre();
       }
     }
   }
 });
-
 // ========== FUNCIONES GLOBALES ==========
 window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
 window.closeRegisterModal = () => document.getElementById('registerModal').classList.remove('active');
@@ -574,7 +588,6 @@ window.selectRole = (role) => { currentRole = role; document.querySelectorAll('.
 window.showLoginModal = () => document.getElementById('loginModal').classList.add('active');
 window.showRegisterModal = () => document.getElementById('registerModal').classList.add('active');
 window.encontrarCofre = () => notifier.showToast('¡Has encontrado un cofre! Pronto más recompensas', 'success');
-
 // ========== SISTEMA DE NOTIFICACIONES ==========
 class NotificationSystem {
   constructor() { this.createContainer(); }
@@ -592,7 +605,6 @@ class NotificationSystem {
   }
 }
 const notifier = new NotificationSystem();
-
 // ========== PARTÍCULAS DEL BOSQUE (sin cambios) ==========
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('forestCanvas');
@@ -614,4 +626,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 </body>
-</html>
