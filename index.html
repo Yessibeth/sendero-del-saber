@@ -13,6 +13,8 @@
 <body>
 <!-- ==================== LANDING PAGE COMPLETA ==================== -->
 <div id="mainScreen">
+
+  <!-- HEADER -->
   <div class="landing-header">
     <div class="logo-header">
       <img src="images/logo.jpg" alt="Logo">
@@ -23,68 +25,47 @@
     </div>
   </div>
 
-<div id="inicio" class="landing-container"> 
-  </div>
-    <div class="hero-banner">
-      <canvas id="forestCanvas" class="forest-canvas"></canvas>
-      <div class="banner-content">
-        <p class="banner-subtitle">COMIENZA TU</p>
-        <img src="images/sendero-del-saber-title.png" alt="SENDERO del SABER" class="banner-title-image">
-        <p class="banner-tagline">CRECE, APRENDE Y SIGUE AVANZANDO,<br>PERO SIEMPRE A TU RITMO.</p>
-        <img src="images/btn-empieza.png" alt="EMPIEZA" class="btn-empieza-img" onclick="document.getElementById('btnRegister').click()">
-      </div>
+  <!-- HERO (solo imagen de fondo + texto) -->
+  <div class="hero-banner">
+    <canvas id="forestCanvas" class="forest-canvas"></canvas>
+    
+    <div class="banner-content">
+      <p class="banner-subtitle">COMIENZA TU</p>
+      <img src="images/sendero-del-saber-title.png" alt="SENDERO del SABER" class="banner-title-image">
+      <p class="banner-tagline">CRECE, APRENDE Y SIGUE AVANZANDO,<br>PERO SIEMPRE A TU RITMO.</p>
+      <img src="images/btn-empieza.png" alt="EMPIEZA" class="btn-empieza-img" onclick="document.getElementById('btnRegister').click()">
     </div>
   </div>
 
-<div id="cursos" class="cursos-destacados-section">
+  <!-- SECCIÓN DE CURSOS (debajo del hero) -->
+  <div id="cursos" class="cursos-destacados-section">
     <div class="landing-container">
       <div class="section-header">
         <h2>APRENDE CON CURSOS DIVERTIDOS E INTERACTIVOS</h2>
         <p class="section-subtitle">ELABORADOS A MANO POR ESTUDIANTES DE LA UNIVERSIDAD DE PANAMÁ.</p>
       </div>
       <div class="courses-grid" id="coursesGrid"></div>
+
       <div class="cursos-button-container">
         <button class="btn-cursos-madera" onclick="document.getElementById('btnRegister').click()">CURSOS</button>
       </div>
     </div>
   </div>
-
+  <!-- HISTORIAS DE ÉXITO -->
   <div class="success-stories">
     <div class="stories-container">
       <h2>HISTORIAS DE ÉXITO DE NUESTROS ALUMNOS</h2>
       <div class="stories-grid">
   <div class="story-card">
-    <img src="images/Genesis.jpg" alt="Alumno" style="width:100%; height:210px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
-    <h4>CURSO LENGUAJE DE SEÑAS</h4>
-    <p>Ame al personaje del zorrito, me gusto los videos y que todo sea pirata...</p>
-    <span class="story-badge">PRINCIPIANTE</span>
+    <img src="images/Genesis.jpg" alt="Genesis">
+    <h3>Genesis López</h3>
+    <p>"Me gusto el zorrito y tambien que es pirata"</p>
   </div>
-  <div class="story-card">
-    <img src="images/mia.jpg" alt="Alumno" style="width:100%; height:210px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
-    <h4>CURSO MATEMÁTICAS</h4>
-    <p>esta divertida la propuesta de este sitio web, es muy dinamico...</p>
-    <span class="story-badge">PRINCIPIANTE</span>
-  </div>
-</div>
-    </div>
-  </div>
-
-  <div id="acerca" class="about-section">
-    <div class="about-container">
-      <h2>Acerca de</h2>
-      <div class="mission-vision">
-        <div class="mission">
-          <h3>Misión</h3>
-          <p>Empoderar a los estudiantes a través de una educación personalizada.</p>
-        </div>
-        <div class="vision">
-          <h3>Visión</h3>
-          <p>Ser una comunidad donde cada persona trace su propio sendero.</p>
-        </div>
+        <!-- Tus story cards aquí -->
       </div>
     </div>
   </div>
-</div> <!-- ← cierre de mainScreen -->
+  <!-- Resto de tu página (Acerca de, Footer, etc.) --><!-- ← cierre de mainScreen -->
 <footer id="contacto" class="site-footer">
     <div class="footer-content">
       <img src="images/sendero-del-saber-title.png" alt="SENDERO del SABER" class="footer-logo">
@@ -409,8 +390,8 @@ function abrirMateria(cursoId) {
 
 function renderMateria() {
   let html = `<div class="dashboard-card"><h2>${materiaActual.nombre}</h2><div class="tabs-container">
-    <button class="tab-btn ${tabActual === 'video' ? 'active' : ''}" onclick="cambiarTab('video')">📹 Video</button>
-    <button class="tab-btn ${tabActual === 'practicas' ? 'active' : ''}" onclick="cambiarTab('practicas')">✏️ Prácticas</button>
+    <button class="tab-btn ${tabActual === 'Introdución' ? 'active' : ''}" onclick="cambiarTab('Introdución')">📹 Video</button>
+    <button class="tab-btn ${tabActual === 'ABC' ? 'active' : ''}" onclick="cambiarTab('ABC')">✏️ Prácticas</button>
     <button class="tab-btn ${tabActual === 'ejercicios' ? 'active' : ''}" onclick="cambiarTab('ejercicios')">📝 Ejercicios</button>
   </div>`;
   
@@ -421,7 +402,7 @@ function renderMateria() {
       html += `<div class="video-container"><iframe src="${materiaActual.videoUrl}" frameborder="0" allowfullscreen></iframe></div>`;
     }
   }
-  if (tabActual === 'practicas') html += `<div>${materiaActual.practicas.map(p => `<div class="pregunta-item"><strong>${p.titulo}</strong><p>${p.descripcion}</p><textarea id="practica_${p.id}" class="textarea-practica" placeholder="Escribe tu respuesta..."></textarea><button class="btn-respuesta" onclick="guardarPractica(${p.id})">Guardar respuesta</button></div>`).join('')}</div>`;
+  if (tabActual === 'ABC') html += `<div>${materiaActual.practicas.map(p => `<div class="pregunta-item"><strong>${p.titulo}</strong><p>${p.descripcion}</p><textarea id="practica_${p.id}" class="textarea-practica" placeholder="Escribe tu respuesta..."></textarea><button class="btn-respuesta" onclick="guardarPractica(${p.id})">Guardar respuesta</button></div>`).join('')}</div>`;
   if (tabActual === 'ejercicios') html += `<div>${materiaActual.ejercicios.map(e => `<div class="pregunta-item"><div class="pregunta-texto">${e.pregunta}</div><div class="opciones">${e.opciones.map((op, idx) => `<div class="opcion" onclick="seleccionarOpcion(${e.id}, ${idx})">${String.fromCharCode(65 + idx)}. ${op}</div>`).join('')}</div><button class="btn-respuesta" onclick="verificarRespuesta(${e.id})">Verificar</button><div id="resEj_${e.id}"></div></div>`).join('')}</div>`;
   document.getElementById('materiaContenido').innerHTML = html;
 }
@@ -446,7 +427,7 @@ async function getHijosVinculados() {
 
 async function renderHijosView() {
   const hijos = await getHijosVinculados();
-  let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mis hijos vinculados</h3>`;
+  let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mi hijo vinculados</h3>`;
   
   if (!hijos.length) {
     html += '<p>No hay hijos vinculados aún.</p>';
@@ -472,7 +453,7 @@ async function renderHijosView() {
 }
 
 async function renderPadrePerfilView() {
-  let html = `<div class="dashboard-card"><h3>👨‍👩‍👧 Mi Perfil (Padre)</h3><div style="display:flex; align-items:center; gap:20px;"><div style="width:80px; height:80px; background:#1F5EAB; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem;">${escapeXSS(usuarioActual.nombre.charAt(0).toUpperCase())}</div><div><h3>${escapeXSS(usuarioActual.nombre)}</h3><p>${usuarioActual.email}</p><div class="codigo-box"><i class="fas fa-link"></i> Código de vinculación: <span>${usuarioActual.codigo_vinculacion}</span></div></div></div></div>`;
+
   document.getElementById('mainContentPadre').innerHTML = html;
 }
 
