@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Isla Señas al Viento | Sendero del Saber</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --azul-mar: #0a1628; --azul-medio: #0f2040; --azul-claro: #1a3a6e;
+      --dorado: #1b1912; --naranja: #FFA500; --violeta: #a855f7;
+      --violeta-claro: #c084fc; --blanco: #ffffff;
+      --texto-claro: rgba(255,255,255,0.88); --texto-muy-claro: rgba(255,255,255,0.5);
+      --sidebar-w: 260px; --verde: #22c55e; --rojo: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--azul-mar);
+  color: var(--blanco);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+
+  background-image:
+    radial-gradient(ellipse at 20% 80%, rgba(10,22,40,0.45) 0%, rgba(10,22,40,0.45) 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.10) 0%, rgba(10,22,40,0.35) 50%),
+    url('images/isla-mar.jpg');
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; padding: 14px 28px;
+      background: rgba(5,12,28,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,215,0,0.15); position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .btn-back {
+      display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 8px 14px;
+      color: var(--texto-claro); font-family: 'Nunito', sans-serif; font-size: 0.85rem;
+      font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .btn-back:hover { background: rgb(255, 217, 0); border-color: rgba(255, 217, 0, 0.901); color: var(--dorado); }
+    .topbar-logo {
+  font-family: 'Gasoek One', cursive;
+  font-size: 1.1rem;
+  color: #FFD700;
+  text-shadow: 0 0 8px rgb(255, 217, 0);
+}
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-user {
+      display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 7px 14px;
+    }
+    .topbar-user span { font-size: 0.88rem; font-weight: 700; color: var(--texto-claro); }
+    .user-avatar-fallback {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--violeta), var(--azul-claro));
+      display: flex; align-items: center; justify-content: center; font-size: 1rem; border: 2px solid var(--dorado);
+    }
+    .btn-salir {
+      display: flex; align-items: center; gap: 7px; background: rgba(255, 100, 100, 0.305);
+      border: 1px solid rgba(255, 100, 100, 0.474); border-radius: 10px; padding: 8px 14px;
+      color: rgba(255,120,120,0.9); font-family: 'Nunito', sans-serif; font-size: 0.85rem;
+      font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-salir:hover { background: rgba(255,100,100,0.2); color: #ff6b6b; }
+    .main-layout {
+      display: grid; grid-template-columns: var(--sidebar-w) 1fr 240px;
+      flex: 1; min-height: calc(100vh - 120px);
+    }
+
+    /* CAMBIO 2 — Sidebar izquierdo más sólido */
+    .sidebar-left {
+      background: rgba(5,12,28,0.92); border-right: 1px solid rgba(255,215,0,0.1);
+      display: flex; flex-direction: column; padding: 20px 16px; gap: 18px; overflow-y: auto;
+    }
+
+    /* CAMBIO 3 — Isla card más sólida */
+    .isla-card {
+      background: linear-gradient(135deg, rgba(168,85,247,0.45), rgba(26,58,110,0.7));
+      border: 1px solid rgba(168,85,247,0.6); border-radius: 16px; padding: 16px; text-align: center;
+    }
+    .isla-icon-wrap {
+      width: 50px; height: 50px;
+      background: linear-gradient(135deg, rgba(168,85,247,0.3), rgba(192,132,252,0.2));
+      border: 2px solid rgba(168,85,247,0.4); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 10px;
+    }
+    .isla-nombre { font-family: 'Gasoek One', cursive; font-size: 0.95rem; color: var(--violeta-claro); margin-bottom: 6px; }
+    .isla-subtitulo { font-size: 0.72rem; color: var(--texto-muy-claro); margin-bottom: 14px; }
+    .progreso-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto 10px; }
+    .progreso-svg { transform: rotate(-90deg); }
+    .progreso-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 8; }
+    .progreso-fill {
+      fill: none; stroke: url(#gradVioleta); stroke-width: 8; stroke-linecap: round;
+      stroke-dasharray: 220; stroke-dashoffset: 220; transition: stroke-dashoffset 1s ease;
+    }
+    .progreso-numero {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 900; color: var(--violeta-claro);
+    }
+    .progreso-label { font-size: 0.75rem; color: var(--texto-muy-claro); margin-bottom: 12px; }
+
+    /* CAMBIO 4 — Foxy card más sólida */
+    .foxy-card {
+      background: linear-gradient(135deg, rgba(20,15,5,0.85), rgba(40,25,5,0.80));
+      border: 1px solid rgba(255, 217, 0, 0.975); border-radius: 16px; padding: 14px; text-align: center;
+    }
+    .foxy-img { width: 90px; height: auto; display: block; margin: 0 auto 8px; filter: drop-shadow(0 4px 12px rgba(255,165,0,0.3)); }
+    .foxy-bubble {
+      background: rgba(255,248,231,0.08); border: 1px solid rgb(255, 217, 0);
+      border-radius: 12px; padding: 10px 12px; font-size: 0.78rem; color: var(--texto-claro);
+      line-height: 1.5; font-style: italic; margin-bottom: 4px;
+    }
+    .foxy-nombre { font-size: 0.7rem; color: var(--dorado); font-weight: 700; }
+
+    /* CAMBIO 5 — Recompensas card más sólida */
+    .recompensas-card {
+      background: rgba(5,12,28,0.75); border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 16px; padding: 14px;
+    }
+    .rc-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #FFD700;
+}
+    .rc-items { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .rc-item { font-size: 1.5rem; }
+    .rc-item.locked { filter: grayscale(1) opacity(0.35); }
+    .rc-info { font-size: 0.72rem; color: var(--texto-muy-claro); margin-bottom: 8px; }
+    .centro { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
+    .aventura-header {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    }
+    .aventura-header-left { display: flex; align-items: center; gap: 12px; }
+    .aventura-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, rgba(168,85,247,0.3), rgba(192,132,252,0.2));
+      border: 2px solid rgba(168,85,247,0.4); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .aventura-titulo { font-size: 1.1rem; font-weight: 800; color: var(--blanco); margin-bottom: 3px; }
+    .aventura-subtitulo { font-size: 0.8rem; color: var(--texto-muy-claro); }
+    .nav-aventuras { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-nav {
+      width: 38px; height: 38px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px; color: var(--blanco); font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-nav:hover { background: rgba(255, 217, 0, 0.974); border-color: rgba(255, 217, 0, 0.918); color: var(--dorado); }
+    .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    .video-container {
+      background: #000; border-radius: 16px; overflow: hidden;
+      border: 2px solid rgba(168,85,247,0.3); position: relative; aspect-ratio: 16/9;
+    }
+    .video-container video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .video-badge {
+      display: none; align-items: center; gap: 8px;
+      background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 10px; padding: 8px 14px; font-size: 0.82rem; font-weight: 700; color: #4ade80; margin-top: -10px;
+    }
+    .video-badge.visible { display: flex; }
+    .actividades-titulo { font-size: 1rem; font-weight: 800; color: var(--blanco); margin-bottom: 14px; }
+    .actividades-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .act-card {
+      border-radius: 14px; padding: 16px 14px; text-align: center; cursor: pointer;
+      transition: all 0.25s; border: 1px solid transparent; position: relative;
+    }
+    .act-card:hover:not(.completada) { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+    /* CAMBIO 1 — Tarjetas de actividades más sólidas */
+    .act-card.comprende { background: linear-gradient(135deg,rgba(168,85,247,0.65),rgba(168,85,247,0.45)); border-color: rgba(168,85,247,0.8); }
+    .act-card.practica  { background: linear-gradient(135deg,rgba(59,130,246,0.65),rgba(59,130,246,0.45)); border-color: rgba(59,130,246,0.8); }
+    .act-card.explora   { background: linear-gradient(135deg,rgba(34,197,94,0.65),rgba(34,197,94,0.45)); border-color: rgba(34,197,94,0.8); }
+
+    .act-card.completada { opacity: 0.7; cursor: default; }
+    .act-card.completada::after {
+      content: '✅ Completado'; position: absolute; top: 8px; right: 8px;
+      background: rgba(34,197,94,0.2); border-radius: 8px; padding: 2px 7px;
+      font-size: 0.7rem; color: #2ce06e; font-weight: 800;
+    }
+    .act-num { font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; }
+    .comprende .act-num {
+  color: #ffffff;
+}
+    .practica  .act-num { color: #ffffff; }
+    .explora   .act-num { color: #ffffff; }
+    .act-card h4 { font-size: 0.9rem; font-weight: 800; color: var(--blanco); margin-bottom: 4px; }
+    .act-card p  { font-size: 0.72rem; color: var(--texto-muy-claro); line-height: 1.4; margin-bottom: 12px; }
+    .act-emoji   { font-size: 2rem; display: block; margin-bottom: 10px; }
+    .act-monedas { display: inline-block; background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.25); border-radius: 20px; padding: 2px 9px; font-size: 0.7rem; font-weight: 800; color: var(--dorado); margin-bottom: 8px; }
+    .btn-comenzar {
+      width: 100%; padding: 9px; border: none; border-radius: 9px;
+      font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 800; cursor: pointer; transition: all 0.2s;
+    }
+    .comprende .btn-comenzar { background: var(--violeta); color: #fff; }
+    .practica  .btn-comenzar { background: #3b82f6; color: #fff; }
+    .explora   .btn-comenzar { background: #22c55e; color: #fff; }
+    .btn-comenzar:hover { transform: translateY(-1px); opacity: 0.9; }
+    .btn-comenzar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* CAMBIO 2 — Sidebar derecho más sólido */
+    .sidebar-right {
+      background: rgba(5,12,28,0.92); border-left: 1px solid rgba(255,215,0,0.1);
+      display: flex; flex-direction: column; padding: 20px 14px; gap: 18px; overflow-y: auto;
+    }
+
+    /* CAMBIO 6 — Panels del sidebar derecho más sólidos */
+    .aventuras-panel, .aprende-panel {
+      background: rgba(5,12,28,0.75); border: 1px solid rgba(255,255,255,0.18); border-radius: 16px; overflow: hidden;
+    }
+    .panel-title {
+      padding: 12px 14px; font-size: 0.82rem; font-weight: 800; color: var(--blanco);
+      background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .aventura-item {
+      display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer;
+      transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .aventura-item:last-child { border-bottom: none; }
+    .aventura-item:hover:not(.locked) { background: rgba(255,215,0,0.06); }
+    .aventura-item.active { background: rgba(168,85,247,0.12); border-left: 3px solid var(--violeta); }
+    .aventura-item.locked { cursor: not-allowed; opacity: 0.5; }
+    .av-num {
+      width: 26px; height: 26px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; flex-shrink: 0;
+    }
+    .av-num.done    { background: rgba(34,197,94,0.2); color: #4ade80; }
+    .av-num.current { background: rgba(168,85,247,0.3); color: var(--violeta-claro); }
+    .av-num.locked-num { background: rgba(255,255,255,0.06); color: var(--texto-muy-claro); }
+    .av-info { flex: 1; min-width: 0; }
+    .av-nombre { font-size: 0.8rem; font-weight: 700; color: var(--texto-claro); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .av-nombre.active-text { color: var(--violeta-claro); font-weight: 800; }
+    .av-icono { font-size: 0.85rem; flex-shrink: 0; }
+    .aprende-item {
+      display: flex; align-items: center; gap: 9px; padding: 9px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.904); font-size: 0.8rem; color: var(--texto-claro);
+    }
+    .aprende-item:last-child { border-bottom: none; }
+    .aprende-check {
+      width: 18px; height: 18px; background: rgba(34,197,94,0.15); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #4ade80; flex-shrink: 0;
+    }
+    .footer-bar {
+      display: flex; align-items: center; justify-content: center; gap: 36px; padding: 13px 28px;
+      background: rgba(5,12,28,0.9); border-top: 1px solid rgba(255,215,0,0.12); flex-wrap: wrap;
+    }
+    .footer-stat { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--texto-claro); }
+    .footer-stat .val {
+  color: #FFD700;
+}
+    .exp-mini { display: flex; align-items: center; gap: 8px; }
+    .exp-mini-bar { width: 100px; height: 7px; background: rgba(15,23,42,0.3); border-radius: 20px; overflow: hidden; }
+    .exp-mini-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 20px; transition: width 0.8s ease; }
+    .nivel-badge {
+      width: 28px; height: 28px; background: linear-gradient(135deg, #FFD700, #ffeb3b);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 900; color: #1a1208;
+    }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(5,12,28,0.92); backdrop-filter: blur(8px);
+      z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: linear-gradient(135deg, #0f2040, #0a1628); border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 24px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+    .modal-titulo { font-size: 1.2rem; font-weight: 900; color: var(--blanco); }
+    .modal-subtitulo { font-size: 0.8rem; color: var(--texto-muy-claro); margin-top: 2px; }
+    .btn-cerrar-modal {
+      width: 36px; height: 36px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; color: var(--texto-claro); font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .btn-cerrar-modal:hover { background: rgba(255,100,100,0.2); color: #ff6b6b; }
+    .pregunta-container { margin-bottom: 20px; }
+    .pregunta-num { font-size: 0.72rem; font-weight: 700; color: var(--texto-muy-claro); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+    .pregunta-img {
+      width: 100%; max-height: 220px; object-fit: contain; border-radius: 14px; margin-bottom: 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); display: block;
+    }
+    .pregunta-texto { font-size: 1rem; font-weight: 800; color: var(--blanco); margin-bottom: 14px; }
+    .opciones-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
+    .opcion-btn {
+      padding: 12px 16px; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 12px; color: var(--texto-claro); font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .opcion-btn:hover:not(:disabled) { background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.3); color: var(--dorado); }
+    .opcion-btn.correcta  { background: rgba(34,197,94,0.2); border-color: #22c55e; color: #4ade80; }
+    .opcion-btn.incorrecta { background: rgba(239,68,68,0.2); border-color: #ef4444; color: #f87171; }
+    .opcion-btn:disabled { cursor: default; }
+    .pareo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .pareo-col-title { font-size: 0.75rem; font-weight: 800; color: var(--texto-muy-claro); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; text-align: center; }
+    .pareo-item {
+      padding: 10px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center;
+      margin-bottom: 8px; font-size: 0.88rem; font-weight: 700; color: var(--texto-claro);
+    }
+    .pareo-item:hover:not(.matched):not(.selected-pareo) { border-color: rgba(255,215,0,0.3); background: rgba(255,215,0,0.06); }
+    .pareo-item.selected-pareo { border-color: var(--violeta); background: rgba(168,85,247,0.15); color: var(--violeta-claro); }
+    .pareo-item.matched { border-color: #22c55e; background: rgba(34,197,94,0.1); color: #4ade80; cursor: default; }
+    .pareo-item.wrong { border-color: #ef4444; background: rgba(239,68,68,0.1); color: #f87171; }
+    .pareo-img-item { padding: 6px; }
+    .pareo-img { width: 100%; height: 80px; object-fit: contain; border-radius: 8px; display: block; background: rgba(255,255,255,0.03); }
+    .feedback-box {
+      display: none; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px;
+      font-size: 0.88rem; font-weight: 700; align-items: center; gap: 10px;
+    }
+    .feedback-box.show { display: flex; }
+    .feedback-box.correcto { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+    .feedback-box.incorrecto { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+    .modal-progreso { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .modal-prog-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; }
+    .modal-prog-fill { height: 100%; background: linear-gradient(90deg, var(--violeta), var(--violeta-claro)); border-radius: 20px; transition: width 0.4s; }
+    .modal-prog-txt { font-size: 0.75rem; color: var(--texto-muy-claro); font-weight: 700; white-space: nowrap; }
+    .btn-siguiente-preg {
+      width: 100%; padding: 12px; background: linear-gradient(135deg, var(--violeta), #9333ea);
+      border: none; border-radius: 12px; color: #fff; font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: all 0.2s; display: none;
+    }
+    .btn-siguiente-preg.show { display: block; }
+    .btn-siguiente-preg:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168,85,247,0.3); }
+    .confeti-container { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+    .confeti-piece { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confetiFall linear forwards; }
+    @keyframes confetiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+    .celebracion-overlay {
+      position: fixed; inset: 0; background: rgba(5,12,28,0.8); backdrop-filter: blur(6px);
+      z-index: 600; display: none; align-items: center; justify-content: center;
+    }
+    .celebracion-overlay.show { display: flex; }
+    .celebracion-box {
+      background: linear-gradient(135deg, #1a4a2e, #0f3020); border: 2px solid rgba(255,215,0,0.4);
+      border-radius: 28px; padding: 36px 40px; text-align: center; max-width: 420px;
+      animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .celebracion-emoji { font-size: 4rem; display: block; margin-bottom: 12px; }
+    .celebracion-titulo { font-family: 'Gasoek One', cursive; font-size: 1.8rem; color: var(--dorado); margin-bottom: 8px; }
+    .celebracion-sub { font-size: 1rem; color: var(--texto-claro); margin-bottom: 20px; }
+    .celebracion-monedas {
+      display: inline-flex; align-items: center; gap: 8px; background: rgba(255,215,0,0.15);
+      border: 1px solid rgba(255,215,0,0.3); border-radius: 20px; padding: 8px 20px;
+      font-size: 1.2rem; font-weight: 900; color: var(--dorado); margin-bottom: 24px;
+    }
+    .btn-celebracion-ok {
+      padding: 14px 40px; background: linear-gradient(135deg, var(--dorado), var(--naranja));
+      border: none; border-radius: 14px; color: #1a1208; font-family: 'Nunito', sans-serif;
+      font-size: 1rem; font-weight: 900; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-celebracion-ok:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(255,215,0,0.3); }
+    .isla-completada-box { background: linear-gradient(135deg, #1a1040, #0f0828); border: 2px solid rgba(168,85,247,0.5); }
+    .loading-overlay {
+      position: fixed; inset: 0; background: #050c1c;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 999;
+    }
+    .spinner { width: 48px; height: 48px; border: 4px solid rgba(168,85,247,0.2); border-top-color: var(--violeta); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay p { color: var(--texto-muy-claro); font-size: 0.9rem; }
+    /* ─── MENÚ DE USUARIO ─── */
+    .user-menu-wrap { position: relative; }
+    .topbar-user { cursor: pointer; user-select: none; }
+    .topbar-user:hover { background: rgba(255,255,255,0.1); }
+    .user-dropdown {
+      position: absolute; top: calc(100% + 10px); right: 0;
+      background: rgba(5,12,28,0.97); border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 16px; padding: 8px; min-width: 200px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5); backdrop-filter: blur(12px);
+      display: none; flex-direction: column; gap: 4px; z-index: 200;
+    }
+    .user-dropdown.open { display: flex; }
+    .drop-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 10px; cursor: pointer;
+      font-size: 0.88rem; font-weight: 700; color: rgba(255,255,255,0.85);
+      transition: background 0.2s; border: none; background: none;
+      font-family: 'Nunito', sans-serif; width: 100%; text-align: left;
+    }
+    .drop-item:hover { background: rgba(255,255,255,0.07); }
+    .drop-item.tienda { color: #FFD700; }
+    .drop-item.tienda:hover { background: rgba(255,215,0,0.1); }
+    .drop-item.salir { color: #f87171; }
+    .drop-item.salir:hover { background: rgba(255,100,100,0.1); }
+    .drop-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0; }
+
+    @media (max-width: 1100px) { .main-layout { grid-template-columns: 220px 1fr 200px; } }
+    @media (max-width: 1100px) { .main-layout { grid-template-columns: 220px 1fr 200px; } }
+    @media (max-width: 860px) { .main-layout { grid-template-columns: 1fr; } .sidebar-left, .sidebar-right { display: none; } .actividades-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><p>Cargando la isla...</p></div>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gradVioleta" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#a855f7"/><stop offset="100%" style="stop-color:#c084fc"/></linearGradient></defs></svg>
+<div class="confeti-container" id="confetiContainer"></div>
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="btn-back"><i class="fas fa-chevron-left"></i> Tu viaje comienza aquí</a>
+    <div class="topbar-logo">SENDERO DEL SABER</div>
+  </div>
+  <div class="topbar-right">
+  <div class="user-menu-wrap">
+    <div class="topbar-user" onclick="toggleMenu()">
+      <div class="user-avatar-fallback" id="avatarTop">🤟</div>
+      <span id="nombreTopbar">Cargando...</span>
+      <i class="fas fa-chevron-down" style="font-size:0.7rem;color:rgba(255,255,255,0.4)"></i>
+    </div>
+    <div class="user-dropdown" id="userDropdown">
+      <button class="drop-item tienda" onclick="irTienda()">🛒 Tienda de avatares</button>
+      <button class="drop-item" onclick="window.location.href='index.html'">🏝️ Mis islas</button>
+      <div class="drop-divider"></div>
+      <button class="drop-item salir" onclick="cerrarSesion()">
+        <i class="fas fa-sign-out-alt"></i> Salir
+      </button>
+    </div>
+  </div>
+</div>
+</header>
+<div class="main-layout">
+  <aside class="sidebar-left">
+    <div class="isla-card">
+      <div class="isla-icon-wrap">🤟</div>
+      <div class="isla-nombre">Isla Señas al Viento</div>
+      <div class="isla-subtitulo">Tu progreso en esta isla</div>
+      <div class="progreso-wrap">
+        <svg class="progreso-svg" width="90" height="90" viewBox="0 0 90 90">
+          <circle class="progreso-bg" cx="45" cy="45" r="35"/>
+          <circle class="progreso-fill" id="progresoCirculo" cx="45" cy="45" r="35"/>
+        </svg>
+        <div class="progreso-numero" id="progresoPct">0%</div>
+      </div>
+      <div class="progreso-label" id="labelProgreso">0 de 8 pasos completados</div>
+    </div>
+    <div class="foxy-card">
+      <img src="images/foxy.png" alt="Foxy" class="foxy-img" onerror="this.style.display='none'"/>
+      <div class="foxy-bubble">¡Aprende el lenguaje de las manos, <span id="foxyNombre">explorador</span>! 🤟</div>
+      <div class="foxy-nombre">— Foxy 🦊</div>
+    </div>
+    <div class="recompensas-card">
+      <div class="rc-title"><i class="fas fa-trophy"></i> Recompensas</div>
+      <div class="rc-items">
+        <span class="rc-item" id="rc1">🤟</span>
+        <span class="rc-item locked" id="rc2">🪙</span>
+        <span class="rc-item locked" id="rc3">💎</span>
+      </div>
+      <div class="rc-info" id="recompensasInfo">0 / 3 recompensas obtenidas</div>
+    </div>
+  </aside>
+  <main class="centro">
+    <div class="aventura-header">
+      <div class="aventura-header-left">
+        <div class="aventura-icon" id="aventuraIcono">🤟</div>
+        <div>
+          <div class="aventura-titulo" id="aventuraTitulo">Aventura 1: El Primer Gesto</div>
+          <div class="aventura-subtitulo" id="aventuraSubtitulo">Aprende los saludos básicos en señas</div>
+        </div>
+      </div>
+      <div class="nav-aventuras">
+        <button class="btn-nav" id="btnAnterior" onclick="cambiarAventura(-1)" disabled><i class="fas fa-chevron-left"></i></button>
+        <button class="btn-nav" id="btnSiguiente" onclick="cambiarAventura(1)"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+    <div class="video-container">
+      <video id="videoPlayer" controls>
+        <source id="videoSource" src="videos/lenguaje-senas.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div id="videoBadge" class="video-badge"><i class="fas fa-check-circle"></i> ¡Video visto! +15🪙</div>
+    <div>
+      <div class="actividades-titulo">Completa las actividades para ganar monedas 🪙</div>
+      <div class="actividades-grid">
+        <div class="act-card comprende" id="cardComprende">
+          <span class="act-emoji">📝</span>
+          <div class="act-num">1. Comprende</div>
+          <h4>¿Qué significa?</h4>
+          <p>Ve la imagen y elige la palabra correcta</p>
+          <div class="act-monedas">+10 🪙</div>
+          <button class="btn-comenzar" id="btnComprende" onclick="abrirActividad('comprende')">Comenzar</button>
+        </div>
+        <div class="act-card practica" id="cardPractica">
+          <span class="act-emoji">🧩</span>
+          <div class="act-num">2. Practica</div>
+          <h4>¿Cuál es la seña?</h4>
+          <p>Lee la palabra y elige la imagen correcta</p>
+          <div class="act-monedas">+10 🪙</div>
+          <button class="btn-comenzar" id="btnPractica" onclick="abrirActividad('practica')">Comenzar</button>
+        </div>
+        <!-- CAMBIO 7 — Imagen del mapa en tarjeta Explora -->
+        <div class="act-card explora" id="cardExplora">
+          <span class="act-emoji">🗺️</span>
+          <div class="act-num">3. Explora</div>
+          <h4>¡Pareo!</h4>
+          <p>Conecta la palabra con su seña correcta</p>
+          <div class="act-monedas">+15 🪙</div>
+          <button class="btn-comenzar" id="btnExplora" onclick="abrirActividad('explora')">Comenzar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <aside class="sidebar-right">
+    <div class="aventuras-panel">
+      <div class="panel-title">Aventuras de la isla</div>
+      <div id="listaAventuras"></div>
+    </div>
+    <div class="aprende-panel">
+      <div class="panel-title">Lo que aprenderás</div>
+      <div class="aprende-item"><div class="aprende-check">✓</div> Saludos básicos</div>
+      <div class="aprende-item"><div class="aprende-check">✓</div> El alfabeto en señas</div>
+    </div>
+  </aside>
+</div>
+<footer class="footer-bar">
+  <div class="footer-stat">🔥 Racha: <span class="val" id="footerRacha">0 días</span></div>
+  <div class="footer-stat">🪙 Monedas: <span class="val" id="footerMonedas">0</span></div>
+  <div class="footer-stat">
+    <div class="nivel-badge" id="footerNivel">1</div>
+    <span>Nivel</span>
+    <div class="exp-mini">
+      <div class="exp-mini-bar"><div class="exp-mini-fill" id="footerExpFill" style="width:0%"></div></div>
+      <span class="val" id="footerExpText">0/1000</span>
+    </div>
+  </div>
+</footer>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-titulo" id="modalTitulo">Actividad</div>
+        <div class="modal-subtitulo" id="modalSubtitulo"></div>
+      </div>
+      <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-progreso">
+      <div class="modal-prog-bar"><div class="modal-prog-fill" id="modalProgFill" style="width:0%"></div></div>
+      <span class="modal-prog-txt" id="modalProgTxt">0 / 5</span>
+    </div>
+    <div id="modalContenido"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <button class="btn-siguiente-preg" id="btnSiguientePreg" onclick="siguientePregunta()">Siguiente →</button>
+  </div>
+</div>
+<div class="celebracion-overlay" id="celebracionOverlay">
+  <div class="celebracion-box" id="celebracionBox">
+    <span class="celebracion-emoji" id="celebracionEmoji">🎉</span>
+    <div class="celebracion-titulo" id="celebracionTitulo">¡Actividad completada!</div>
+    <div class="celebracion-sub" id="celebracionSub">¡Excelente trabajo!</div>
+    <div class="celebracion-monedas" id="celebracionMonedas">+15 🪙</div>
+    <button class="btn-celebracion-ok" onclick="cerrarCelebracion()">¡Genial! 🎊</button>
+  </div>
+</div>
+<script>
+const SUPABASE_URL = 'https://qxwjuevahjrdtvtylexj.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_N7ZF6WW1hC_Ncpc9-7WHSw_XRjM_qi6';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const MATERIA_ID = 4;
+const MONEDAS_POR_ISLA = 25;
+
+const AVENTURAS = [
+  { id:1, titulo:'El Primer Gesto',    subtitulo:'Aprende los saludos básicos en señas', video:'videos/lenguaje-senas.mp4',  icono:'🤟', libre:true  },
+  { id:2, titulo:'El Alfabeto Mágico', subtitulo:'Aprende las letras con tus manos',     video:'videos/lenguaje-senas2.mp4', icono:'🔤', libre:true  },
+  { id:3, titulo:'Los Números Hab...', subtitulo:'Cuenta del 1 al 10 en señas',          video:null, icono:'🔢', libre:false },
+  { id:4, titulo:'La Cueva del Sile...', subtitulo:'Expresiones y emociones en señas',   video:null, icono:'😊', libre:false },
+  { id:5, titulo:'El Guardián de la...', subtitulo:'Frases completas del día a día',      video:null, icono:'🙌', libre:false },
+  { id:6, titulo:'La Voz Sin Palab...', subtitulo:'Conversación básica completa',         video:null, icono:'💬', libre:false }
+];
+
+const AVENTURAS_ACTIVAS = AVENTURAS.filter(av => av.libre);
+const TOTAL_PASOS = AVENTURAS_ACTIVAS.length * 4;
+
+const PESO_VIDEO     = 15;
+const PESO_COMPRENDE = 10;
+const PESO_PRACTICA  = 10;
+const PESO_EXPLORA   = 15;
+
+const PREGUNTAS = {
+  comprende: [
+    { img:'images/senas/sena-hola.jpg',     respuesta:'Hola',      opciones:['Hola','Adios','Gracias','Si'] },
+    { img:'images/senas/sena-adios.jpg',    respuesta:'Adios',     opciones:['Hola','Adios','Por favor','No'] },
+    { img:'images/senas/sena-gracias.jpg',  respuesta:'Gracias',   opciones:['Ayuda','Bien','Gracias','Si'] },
+    { img:'images/senas/sena-porfavor.jpg', respuesta:'Por favor', opciones:['Por favor','Adios','No','Casa'] },
+    { img:'images/senas/sena-si.jpg',       respuesta:'Si',        opciones:['No','Si','Hola','Gracias'] }
+  ],
+  practica: [
+    { palabra:'No',    img:'images/senas/sena-no.jpg',    opciones:['images/senas/sena-no.jpg','images/senas/sena-amigo.jpg','images/senas/sena-ayuda.jpg','images/senas/sena-casa.jpg'] },
+    { palabra:'Amigo', img:'images/senas/sena-amigo.jpg', opciones:['images/senas/sena-casa.jpg','images/senas/sena-amigo.jpg','images/senas/sena-bien.jpg','images/senas/sena-no.jpg'] },
+    { palabra:'Ayuda', img:'images/senas/sena-ayuda.jpg', opciones:['images/senas/sena-bien.jpg','images/senas/sena-ayuda.jpg','images/senas/sena-no.jpg','images/senas/sena-amigo.jpg'] },
+    { palabra:'Casa',  img:'images/senas/sena-casa.jpg',  opciones:['images/senas/sena-amigo.jpg','images/senas/sena-no.jpg','images/senas/sena-casa.jpg','images/senas/sena-bien.jpg'] },
+    { palabra:'Bien',  img:'images/senas/sena-bien.jpg',  opciones:['images/senas/sena-ayuda.jpg','images/senas/sena-bien.jpg','images/senas/sena-casa.jpg','images/senas/sena-amigo.jpg'] }
+  ],
+  explora: [
+    { palabra:'Mal',    img:'images/senas/sena-mal.jpg' },
+    { palabra:'Agua',   img:'images/senas/sena-agua.jpg' },
+    { palabra:'Comer',  img:'images/senas/sena-comer.jpg' },
+    { palabra:'Dormir', img:'images/senas/sena-dormir.jpg' },
+    { palabra:'Jugar',  img:'images/senas/sena-jugar.jpg' }
+  ]
+};
+
+let estudianteId = null;
+let monedasActuales = 0;
+let aventuraActual = 0;
+let progresoAventura = {};
+let actividadActual = null;
+let preguntaIndex = 0;
+let respuestasCorrectas = 0;
+let respondida = false;
+let pareosCompletados = 0;
+
+function calcularPorcentaje() {
+  let puntosObtenidos = 0;
+  for (const av of AVENTURAS_ACTIVAS) {
+    const p = progresoAventura[av.id] || {};
+    if (p.video)     puntosObtenidos += PESO_VIDEO;
+    if (p.comprende) puntosObtenidos += PESO_COMPRENDE;
+    if (p.practica)  puntosObtenidos += PESO_PRACTICA;
+    if (p.explora)   puntosObtenidos += PESO_EXPLORA;
+  }
+  return Math.min(puntosObtenidos, 100);
+}
+
+function calcularPasosCompletados() {
+  let total = 0;
+  for (const av of AVENTURAS_ACTIVAS) {
+    const p = progresoAventura[av.id] || {};
+    if (p.video)     total++;
+    if (p.comprende) total++;
+    if (p.practica)  total++;
+    if (p.explora)   total++;
+  }
+  return total;
+}
+
+function actualizarCirculo() {
+  const pct = calcularPorcentaje();
+  const offset = 220 - (pct / 100) * 220;
+  document.getElementById('progresoCirculo').style.strokeDashoffset = offset;
+  document.getElementById('progresoPct').textContent = pct + '%';
+  const completados = calcularPasosCompletados();
+  document.getElementById('labelProgreso').textContent = `${completados} de ${TOTAL_PASOS} pasos completados`;
+  const rc = pct >= 100 ? 3 : pct >= 66 ? 2 : pct >= 33 ? 1 : 0;
+  ['rc1','rc2','rc3'].forEach((id,i) => document.getElementById(id).classList.toggle('locked', i >= rc));
+  document.getElementById('recompensasInfo').textContent = `${rc} / 3 recompensas obtenidas`;
+}
+
+async function cargarDatos() {
+  estudianteId = localStorage.getItem('usuarioActualId');
+  if (!estudianteId) { window.location.href = 'index.html'; return; }
+  try {
+    const { data: u } = await db.from('usuarios').select('*').eq('id', estudianteId).maybeSingle();
+    if (!u) { window.location.href = 'index.html'; return; }
+    monedasActuales = u.monedas || 0;
+    const nivel = u.nivel || 1, exp = u.exp || 0, expMax = nivel * 1000;
+    document.getElementById('nombreTopbar').textContent  = u.nombre;
+    // Mostrar avatar equipado
+if (u.avatar_equipado) {
+  const { data: av } = await db
+    .from('avatares')
+    .select('imagen')
+    .eq('id', u.avatar_equipado)
+    .single();
+  if (av) {
+    const avatarEl = document.getElementById('avatarTop');
+    avatarEl.innerHTML = `<img src="images/${av.imagen}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`;
+  }
+}
+    document.getElementById('foxyNombre').textContent    = u.nombre;
+    document.getElementById('footerRacha').textContent   = `${u.racha_dias || 0} días`;
+    document.getElementById('footerRacha').textContent=`${u.racha_dias||0} días`;
+
+// Lógica de racha
+const hoy = new Date().toISOString().split('T')[0];
+const ultimoAcceso = u.ultimo_acceso || '';
+if(ultimoAcceso !== hoy){
+  const ayer = new Date();
+  ayer.setDate(ayer.getDate() - 1);
+  const ayerStr = ayer.toISOString().split('T')[0];
+  let nuevaRacha;
+  if(ultimoAcceso === ayerStr){
+    nuevaRacha = (u.racha_dias || 0) + 1;
+  } else {
+    nuevaRacha = 1;
+  }
+  await db.from('usuarios').update({
+    racha_dias: nuevaRacha,
+    ultimo_acceso: hoy
+  }).eq('id', estudianteId);
+  document.getElementById('footerRacha').textContent = `${nuevaRacha} días`;
+}
+
+document.getElementById('footerMonedas').textContent=monedasActuales.toLocaleString();
+    document.getElementById('footerMonedas').textContent = monedasActuales.toLocaleString();
+    document.getElementById('footerNivel').textContent   = nivel;
+    document.getElementById('footerExpFill').style.width = Math.min((exp/expMax)*100,100) + '%';
+    document.getElementById('footerExpText').textContent = `${exp}/${expMax}`;
+
+    const { data: prog } = await db.from('progreso_materia')
+      .select('*').eq('estudiante_id', estudianteId).eq('materia_id', MATERIA_ID).maybeSingle();
+    if (prog && prog.detalle_actividades) {
+      try { progresoAventura = JSON.parse(prog.detalle_actividades); } catch(e) {}
+    }
+    actualizarCirculo();
+  } catch(e) { console.error('Error cargando:', e); }
+  renderLista();
+  seleccionarAventura(0);
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function renderLista() {
+  document.getElementById('listaAventuras').innerHTML = AVENTURAS.map((av, i) => {
+    const esActual = i === aventuraActual;
+    const p = progresoAventura[av.id] || {};
+    const completa = p.comprende && p.practica && p.explora && p.video;
+    const bloqueada = !av.libre;
+    const numClass = completa ? 'done' : esActual ? 'current' : 'locked-num';
+    const icono    = completa ? '✅' : bloqueada ? '🔒' : esActual ? '▶' : '';
+    return `
+      <div class="aventura-item ${esActual?'active':''} ${bloqueada?'locked':''}"
+           onclick="${!bloqueada ? `seleccionarAventura(${i})` : ''}">
+        <div class="av-num ${numClass}">${av.id}</div>
+        <div class="av-info"><div class="av-nombre ${esActual?'active-text':''}">${av.titulo}</div></div>
+        <div class="av-icono">${icono}</div>
+      </div>`;
+  }).join('');
+}
+
+function seleccionarAventura(index) {
+  aventuraActual = index;
+  const av = AVENTURAS[index];
+  document.getElementById('aventuraTitulo').textContent    = `Aventura ${av.id}: ${av.titulo}`;
+  document.getElementById('aventuraSubtitulo').textContent = av.subtitulo;
+  document.getElementById('aventuraIcono').textContent     = av.icono;
+  const vp = document.getElementById('videoPlayer');
+  const vs = document.getElementById('videoSource');
+  if (av.video) { vs.src = av.video; vp.load(); vp.style.display = 'block'; }
+  else          { vp.style.display = 'none'; }
+  const p = progresoAventura[av.id] || {};
+  actualizarActividades(p);
+  document.getElementById('videoBadge').classList.toggle('visible', !!p.video);
+  document.getElementById('btnAnterior').disabled = index === 0;
+  const sigIdx = index + 1;
+  document.getElementById('btnSiguiente').disabled = !(sigIdx < AVENTURAS.length && AVENTURAS[sigIdx].libre);
+  renderLista();
+}
+
+function cambiarAventura(dir) {
+  const n = aventuraActual + dir;
+  if (n >= 0 && n < AVENTURAS.length && AVENTURAS[n].libre) seleccionarAventura(n);
+}
+
+function actualizarActividades(p) {
+  ['comprende','practica','explora'].forEach(t => {
+    const nom = t.charAt(0).toUpperCase() + t.slice(1);
+    const card = document.getElementById('card'+nom);
+    const btn  = document.getElementById('btn'+nom);
+    if (p[t]) { card.classList.add('completada'); btn.textContent = '✅ Completado'; btn.disabled = true; }
+    else       { card.classList.remove('completada'); btn.textContent = 'Comenzar'; btn.disabled = false; }
+  });
+}
+
+document.getElementById('videoPlayer').addEventListener('ended', async () => {
+  const av = AVENTURAS[aventuraActual];
+  if (!av.libre) return;
+  const p = progresoAventura[av.id] || {};
+  if (p.video) return;
+  p.video = true;
+  progresoAventura[av.id] = p;
+  document.getElementById('videoBadge').classList.add('visible');
+  monedasActuales += 15;
+  document.getElementById('footerMonedas').textContent = monedasActuales.toLocaleString();
+  actualizarCirculo();
+  renderLista();
+  await guardarProgreso();
+  mostrarCelebracion(15, false, '¡Video completado!', '🎬');
+  lanzarConfeti();
+});
+
+function abrirActividad(tipo) {
+  actividadActual = tipo; preguntaIndex = 0; respuestasCorrectas = 0;
+  respondida = false; pareosCompletados = 0;
+  window._pareoSelPalIdx = null; window._pareoSelPalNombre = null;
+  const titulos = { comprende:'📝 ¿Qué significa esta seña?', practica:'🧩 ¿Cuál es la seña correcta?', explora:'🗺️ ¡Pareo de señas!' };
+  const subs    = { comprende:'Mira la imagen y elige la palabra correcta', practica:'Lee la palabra y elige la imagen', explora:'Une cada palabra con su seña' };
+  document.getElementById('modalTitulo').textContent    = titulos[tipo];
+  document.getElementById('modalSubtitulo').textContent = subs[tipo];
+  document.getElementById('feedbackBox').className      = 'feedback-box';
+  document.getElementById('btnSiguientePreg').className = 'btn-siguiente-preg';
+  if (tipo === 'explora') { renderPareo(); actualizarProgModal(0,5); }
+  else renderPregunta();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function cerrarModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+function actualizarProgModal(a, t) {
+  document.getElementById('modalProgFill').style.width = (a/t*100)+'%';
+  document.getElementById('modalProgTxt').textContent  = `${a} / ${t}`;
+}
+
+function renderPregunta() {
+  const preguntas = PREGUNTAS[actividadActual];
+  if (preguntaIndex >= preguntas.length) { finalizarActividad(); return; }
+  const preg = preguntas[preguntaIndex];
+  respondida = false;
+  actualizarProgModal(preguntaIndex, preguntas.length);
+  document.getElementById('feedbackBox').className      = 'feedback-box';
+  document.getElementById('btnSiguientePreg').className = 'btn-siguiente-preg';
+  const fb = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='150'><rect fill='%231a3a6e' width='200' height='150'/><text fill='%23a855f7' font-size='40' x='50%25' y='50%25' text-anchor='middle' dy='.3em'>🤟</text></svg>`;
+  const fs = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='80'><rect fill='%231a3a6e' width='100' height='80'/><text fill='%23a855f7' font-size='24' x='50%25' y='50%25' text-anchor='middle' dy='.3em'>🤟</text></svg>`;
+  let html = `<div class="pregunta-container"><div class="pregunta-num">Pregunta ${preguntaIndex+1} de ${preguntas.length}</div>`;
+  if (actividadActual === 'comprende') {
+    html += `<img src="${preg.img}" alt="seña" class="pregunta-img" onerror="this.src='${fb}'">
+    <div class="pregunta-texto">¿Qué significa esta seña?</div><div class="opciones-grid">`;
+    preg.opciones.forEach(op => { html += `<button class="opcion-btn" onclick="responderComprende('${op}','${preg.respuesta}')">${op}</button>`; });
+    html += `</div>`;
+  } else {
+    html += `<div class="pregunta-texto">¿Cuál es la seña de "<strong style="color:var(--dorado)">${preg.palabra}</strong>"?</div><div class="opciones-grid">`;
+    preg.opciones.forEach(src => { html += `<button class="opcion-btn" onclick="responderPractica('${src}','${preg.img}')" style="padding:6px;"><img src="${src}" style="width:100%;height:80px;object-fit:contain;border-radius:8px;" onerror="this.src='${fs}'"></button>`; });
+    html += `</div>`;
+  }
+  html += `</div>`;
+  document.getElementById('modalContenido').innerHTML = html;
+}
+
+function responderComprende(sel, cor) {
+  if (respondida) return; respondida = true;
+  document.querySelectorAll('.opcion-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent.trim() === cor) b.classList.add('correcta');
+    if (b.textContent.trim() === sel && sel !== cor) b.classList.add('incorrecta');
+  });
+  const esCor = sel === cor;
+  mostrarFeedback(esCor);
+  if (esCor) respuestasCorrectas++;
+  document.getElementById('btnSiguientePreg').classList.add('show');
+}
+
+function responderPractica(sel, cor) {
+  if (respondida) return; respondida = true;
+  document.querySelectorAll('.opcion-btn').forEach(b => {
+    b.disabled = true;
+    const s = b.querySelector('img')?.src || '';
+    if (s.includes(cor.split('/').pop())) b.classList.add('correcta');
+    if (s.includes(sel.split('/').pop()) && sel !== cor) b.classList.add('incorrecta');
+  });
+  const esCor = sel === cor;
+  mostrarFeedback(esCor);
+  if (esCor) respuestasCorrectas++;
+  document.getElementById('btnSiguientePreg').classList.add('show');
+}
+
+function mostrarFeedback(ok) {
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box show ' + (ok ? 'correcto' : 'incorrecto');
+  fb.innerHTML = ok ? '<i class="fas fa-check-circle"></i> ¡Correcto! ¡Excelente!' : '<i class="fas fa-times-circle"></i> ¡Casi! Sigue intentando.';
+}
+
+function siguientePregunta() {
+  preguntaIndex++;
+  document.getElementById('feedbackBox').className      = 'feedback-box';
+  document.getElementById('btnSiguientePreg').className = 'btn-siguiente-preg';
+  if (preguntaIndex >= PREGUNTAS[actividadActual].length) finalizarActividad();
+  else renderPregunta();
+}
+
+function renderPareo() {
+  const items = PREGUNTAS.explora;
+  pareosCompletados = 0;
+  actualizarProgModal(0, items.length);
+  const mez = [...items].sort(() => Math.random() - 0.5);
+  let html = `<div class="pareo-grid"><div><div class="pareo-col-title">Palabras</div>
+    ${items.map((it,i) => `<div class="pareo-item" id="pp-${i}" onclick="selPalabra(${i},'${it.palabra}')">${it.palabra}</div>`).join('')}
+  </div><div><div class="pareo-col-title">Señas</div>
+    ${mez.map((it,i) => `<div class="pareo-item pareo-img-item" id="pi-${i}" onclick="selImagen(${i},'${it.img}','${it.palabra}')">
+      <img src="${it.img}" class="pareo-img" onerror="this.parentElement.textContent='🤟'"></div>`).join('')}
+  </div></div>`;
+  document.getElementById('modalContenido').innerHTML = html;
+  window._pareoItems = items; window._pareoMez = mez;
+  window._pareoSelPalIdx = null; window._pareoSelPalNombre = null;
+}
+
+function selPalabra(idx, nombre) {
+  const el = document.getElementById(`pp-${idx}`);
+  if (el.classList.contains('matched')) return;
+  if (window._pareoSelPalIdx !== null && window._pareoSelPalIdx !== idx) {
+    const prev = document.getElementById(`pp-${window._pareoSelPalIdx}`);
+    if (prev && !prev.classList.contains('matched')) prev.classList.remove('selected-pareo');
+  }
+  window._pareoSelPalIdx = idx; window._pareoSelPalNombre = nombre;
+  el.classList.add('selected-pareo');
+}
+
+function selImagen(idx, imgSrc, palabraCorrecta) {
+  const elImg = document.getElementById(`pi-${idx}`);
+  if (elImg.classList.contains('matched') || window._pareoSelPalNombre === null) return;
+  const elPal = document.getElementById(`pp-${window._pareoSelPalIdx}`);
+  if (window._pareoSelPalNombre === palabraCorrecta) {
+    elPal.classList.remove('selected-pareo'); elPal.classList.add('matched'); elImg.classList.add('matched');
+    pareosCompletados++;
+    actualizarProgModal(pareosCompletados, window._pareoItems.length);
+    if (pareosCompletados === window._pareoItems.length) setTimeout(() => finalizarActividad(), 600);
+  } else {
+    elPal.classList.add('wrong'); elImg.classList.add('wrong');
+    setTimeout(() => { elPal.classList.remove('wrong','selected-pareo'); elImg.classList.remove('wrong'); }, 800);
+  }
+  window._pareoSelPalIdx = null; window._pareoSelPalNombre = null;
+}
+
+async function finalizarActividad() {
+  cerrarModal();
+  const av = AVENTURAS[aventuraActual];
+  const p  = progresoAventura[av.id] || {};
+  if (p[actividadActual]) return;
+
+  let ganóMonedas = false;
+  if (actividadActual === 'explora') {
+    ganóMonedas = true;
+  } else {
+    ganóMonedas = respuestasCorrectas >= 3;
+  }
+
+  p[actividadActual] = true;
+  progresoAventura[av.id] = p;
+
+  const nom = actividadActual.charAt(0).toUpperCase() + actividadActual.slice(1);
+  document.getElementById('card'+nom).classList.add('completada');
+  const btn = document.getElementById('btn'+nom);
+  btn.textContent = '✅ Completado'; btn.disabled = true;
+
+  const monedas = actividadActual === 'explora' ? 15 : 10;
+
+  if (ganóMonedas) {
+    monedasActuales += monedas;
+    document.getElementById('footerMonedas').textContent = monedasActuales.toLocaleString();
+  }
+
+  actualizarCirculo();
+  renderLista();
+
+  await guardarProgreso();
+  await registrarActividad(`Completó "${actividadActual}" en Isla Señas (Av.${av.id})`, actividadActual);
+
+  if (calcularPorcentaje() === 100) {
+    monedasActuales += MONEDAS_POR_ISLA;
+    document.getElementById('footerMonedas').textContent = monedasActuales.toLocaleString();
+
+    const nivelActual = parseInt(document.getElementById('footerNivel').textContent) || 1;
+    const expNueva = 1000;
+    const nivelNuevo = nivelActual + 1;
+    document.getElementById('footerNivel').textContent = nivelNuevo;
+
+    await db.from('usuarios').update({ 
+        nivel: nivelNuevo, 
+        exp: expNueva,
+        monedas: monedasActuales 
+    }).eq('id', estudianteId);
+
+    await db.from('metas')
+        .update({ progreso: monedasActuales })
+        .eq('estudiante_id', estudianteId)
+        .eq('descripcion', 'Acumula 100 monedas');
+
+    await db.from('metas')
+        .update({ progreso: expNueva, completada: expNueva >= 1000 })
+        .eq('estudiante_id', estudianteId)
+        .eq('descripcion', 'Sube al nivel 2');
+
+    await db.from('metas')
+        .update({ progreso: 1, completada: true })
+        .eq('estudiante_id', estudianteId)
+        .eq('descripcion', 'Completa tu primera isla');
+
+    await guardarProgreso();
+    setTimeout(() => mostrarCelebracion(MONEDAS_POR_ISLA, true, '¡Isla completada!', '🏆'), 1500);
+  }
+
+  if (ganóMonedas) {
+    mostrarCelebracion(monedas, false, `¡${nom} completado!`, '🎉');
+    lanzarConfeti();
+  } else {
+    const celebBox = document.getElementById('celebracionBox');
+    celebBox.className = 'celebracion-box';
+    document.getElementById('celebracionEmoji').textContent  = '📝';
+    document.getElementById('celebracionTitulo').textContent = 'Actividad completada';
+    document.getElementById('celebracionSub').textContent    = `Tuviste ${respuestasCorrectas}/5 correctas. ¡Necesitas 3 para ganar monedas!`;
+    document.getElementById('celebracionMonedas').textContent = 'Sin monedas esta vez';
+    document.getElementById('celebracionMonedas').style.fontSize = '0.9rem';
+    document.getElementById('celebracionOverlay').classList.add('show');
+  }
+}
+
+async function guardarProgreso() {
+  try {
+    const pct = calcularPorcentaje();
+    await db.from('usuarios').update({ monedas: monedasActuales }).eq('id', estudianteId);
+    const { data: ex } = await db.from('progreso_materia')
+      .select('id').eq('estudiante_id', estudianteId).eq('materia_id', MATERIA_ID).maybeSingle();
+    const completadas = AVENTURAS_ACTIVAS.filter(av => {
+      const p = progresoAventura[av.id] || {};
+      return p.comprende && p.practica && p.explora && p.video;
+    }).length;
+    const datos = {
+      estudiante_id: estudianteId, materia_id: MATERIA_ID, porcentaje: pct,
+      aventuras_completadas: completadas,
+      detalle_actividades: JSON.stringify(progresoAventura),
+      updated_at: new Date().toISOString()
+    };
+    if (ex) await db.from('progreso_materia').update(datos).eq('id', ex.id);
+    else     await db.from('progreso_materia').insert(datos);
+    console.log('✅ Guardado:', pct + '%', progresoAventura);
+  } catch(e) { console.error('❌ Error guardando:', e); }
+}
+
+async function registrarActividad(desc, tipo) {
+  try {
+    await db.from('actividad_log').insert({
+      estudiante_id: estudianteId, tipo, descripcion: desc, created_at: new Date().toISOString()
+    });
+  } catch(e) {}
+}
+
+function mostrarCelebracion(monedas, esIsla, titulo, emoji) {
+  const box = document.getElementById('celebracionBox');
+  box.className = 'celebracion-box' + (esIsla ? ' isla-completada-box' : '');
+  document.getElementById('celebracionEmoji').textContent  = emoji || '🎉';
+  document.getElementById('celebracionTitulo').textContent = titulo || '¡Completado!';
+  document.getElementById('celebracionSub').textContent    = esIsla ? '¡Completaste toda la isla! ¡Eres increíble!' : '¡Excelente trabajo! Sigue así.';
+  document.getElementById('celebracionMonedas').textContent = `+${monedas} 🪙`;
+  document.getElementById('celebracionMonedas').style.fontSize = '1.2rem';
+  document.getElementById('celebracionOverlay').classList.add('show');
+}
+
+function cerrarCelebracion() { document.getElementById('celebracionOverlay').classList.remove('show'); }
+
+function lanzarConfeti() {
+  const c = document.getElementById('confetiContainer');
+  const cols = ['#FFD700','#a855f7','#22c55e','#3b82f6','#ef4444','#f97316','#ec4899','#fff'];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div');
+    p.className = 'confeti-piece';
+    p.style.cssText = `left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};width:${Math.random()*10+6}px;height:${Math.random()*10+6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${Math.random()*2+2}s;animation-delay:${Math.random()*.5}s;`;
+    c.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+
+function cerrarSesion() { localStorage.removeItem('usuarioActualId'); window.location.href = 'index.html'; }
+
+function toggleMenu() {
+  document.getElementById('userDropdown').classList.toggle('open');
+}
+function irTienda() {
+  window.location.href = 'tienda.html';
+}
+// Cerrar menú al hacer clic fuera
+document.addEventListener('click', function(e) {
+  const wrap = document.querySelector('.user-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+});
+
+cargarDatos();
+</script>
+</body>
+</html>

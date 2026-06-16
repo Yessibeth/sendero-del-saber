@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Padre | Sendero del Saber</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --verde-oscuro: #0d2b1a;
+      --verde-medio: #1a4a2e;
+      --verde-claro: #2d7a4a;
+      --dorado: #FFD700;
+      --dorado-oscuro: #c8a200;
+      --naranja: #FFA500;
+      --crema: #fff8e7;
+      --blanco: #ffffff;
+      --texto-claro: rgba(255,255,255,0.85);
+      --texto-muy-claro: rgba(255,255,255,0.5);
+      --sidebar-w: 260px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito', sans-serif; background: var(--verde-oscuro); color: var(--blanco); min-height: 100vh; display: flex; overflow-x: hidden; }
+    .sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, #0a1f12 0%, #0d2b1a 60%, #091a10 100%); border-right: 1px solid rgba(255,215,0,0.15); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; overflow-y: auto; }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 22px 20px 18px; border-bottom: 1px solid rgba(255,215,0,0.12); }
+    .sidebar-logo img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+    .sidebar-logo span { font-family: 'Gasoek One', cursive; font-size: 1rem; color: var(--dorado); line-height: 1.2; }
+    .sidebar-profile { padding: 22px 20px; text-align: center; border-bottom: 1px solid rgba(255,215,0,0.1); }
+    .profile-avatar-wrap { position: relative; display: inline-block; margin-bottom: 12px; }
+    .profile-avatar-emoji { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #1a4a2e, #2d7a4a); border: 3px solid var(--dorado); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto; }
+    .profile-level-badge { position: absolute; bottom: -4px; right: -4px; background: linear-gradient(135deg, var(--dorado), var(--naranja)); color: #1a1208; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 20px; }
+    .profile-name { font-size: 1.05rem; font-weight: 800; color: var(--blanco); margin-bottom: 4px; }
+    .profile-role { font-size: 0.78rem; color: var(--texto-muy-claro); margin-bottom: 6px; }
+    .profile-coins { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.25); border-radius: 20px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; color: var(--dorado); margin-top: 6px; }
+    .sidebar-nav { padding: 15px 12px; flex: 1; }
+    .nav-label { font-size: 0.65rem; font-weight: 700; color: var(--texto-muy-claro); letter-spacing: 1.5px; text-transform: uppercase; padding: 0 10px; margin: 12px 0 6px; }
+    .nav-item { display: flex; align-items: center; gap: 11px; padding: 11px 14px; border-radius: 12px; cursor: pointer; transition: all 0.25s; font-size: 0.9rem; font-weight: 600; color: var(--texto-claro); margin-bottom: 3px; }
+    .nav-item i { width: 18px; font-size: 0.95rem; text-align: center; color: var(--texto-muy-claro); transition: color 0.25s; }
+    .nav-item:hover { background: rgba(255,215,0,0.08); color: var(--blanco); }
+    .nav-item:hover i { color: var(--dorado); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.1)); color: var(--dorado); border: 1px solid rgba(255,215,0,0.25); }
+    .nav-item.active i { color: var(--dorado); }
+    .sidebar-control { margin: 12px; background: rgba(255,215,0,0.07); border: 1px solid rgba(255,215,0,0.18); border-radius: 14px; padding: 14px; }
+    .control-title { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 700; color: var(--dorado); margin-bottom: 10px; }
+    .usage-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--texto-muy-claro); margin-bottom: 5px; }
+    .usage-bar { background: rgba(255,255,255,0.1); border-radius: 20px; height: 6px; overflow: hidden; }
+    .usage-fill { background: linear-gradient(90deg, #4ade80, #FFD700); height: 100%; border-radius: 20px; transition: width 0.5s ease; }
+    .sidebar-logout { margin: 0 12px 16px; display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: rgba(255,100,100,0.8); transition: all 0.25s; }
+    .sidebar-logout:hover { background: rgba(255,100,100,0.12); color: #ff6b6b; }
+    .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; background: linear-gradient(160deg, #0d2b1a 0%, #091810 40%, #060f09 100%); display: flex; flex-direction: column; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 30px; border-bottom: 1px solid rgba(255,215,0,0.1); background: rgba(10,25,15,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-size: 1.25rem; font-weight: 800; color: var(--blanco); }
+    .topbar-left p { font-size: 0.82rem; color: var(--texto-muy-claro); margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-user { display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 6px 12px; }
+    .topbar-user-avatar { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--verde-claro), var(--dorado)); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .topbar-user span { font-size: 0.85rem; font-weight: 700; color: var(--texto-claro); }
+    .content { padding: 28px 30px; flex: 1; }
+    .hero-card { background: linear-gradient(135deg, #1a4a2e 0%, #0f3020 50%, #1a4a2e 100%); border: 1px solid rgba(255,215,0,0.2); border-radius: 20px; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; overflow: hidden; position: relative; gap: 20px; }
+    .hero-card::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%); border-radius: 50%; }
+    .hero-left { display: flex; align-items: center; gap: 18px; }
+    .hero-foxy { font-size: 3.5rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
+    .hero-text h2 { font-size: 1.3rem; font-weight: 800; color: var(--blanco); margin-bottom: 5px; }
+    .hero-text p { font-size: 0.88rem; color: var(--texto-claro); }
+    .hero-text .highlight { color: var(--dorado); font-weight: 700; }
+    .hero-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+    .level-shield { width: 64px; height: 64px; background: linear-gradient(135deg, var(--dorado), var(--naranja)); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-family: 'Gasoek One', cursive; font-size: 1.8rem; color: #1a1208; box-shadow: 0 6px 20px rgba(255,215,0,0.3); }
+    .exp-section { min-width: 160px; }
+    .exp-section p { font-size: 0.75rem; color: var(--texto-muy-claro); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .exp-bar { background: rgba(15,23,42,0.3); border-radius: 20px; height: 8px; overflow: hidden; margin-bottom: 5px; }
+    .exp-fill { background: linear-gradient(90deg, #4ade80, var(--dorado)); height: 100%; border-radius: 20px; transition: width 0.8s ease; }
+    .exp-section span { font-size: 0.78rem; color: var(--dorado); font-weight: 700; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 20px; transition: border-color 0.3s; }
+    .card:hover { border-color: rgba(255,215,0,0.2); }
+    .card-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .card-title h3 { font-size: 0.92rem; font-weight: 800; color: var(--blanco); display: flex; align-items: center; gap: 8px; }
+    .card-title h3 i { color: var(--dorado); font-size: 0.85rem; }
+    .subject-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .subject-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
+    .subject-info { flex: 1; }
+    .subject-name { font-size: 0.82rem; font-weight: 700; color: var(--texto-claro); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .subject-pct { font-weight: 800; font-size: 0.82rem; }
+    .subject-bar { background: rgba(255,255,255,0.08); border-radius: 20px; height: 5px; overflow: hidden; }
+    .subject-bar-fill { height: 100%; border-radius: 20px; transition: width 0.8s ease; }
+    .activity-item { display: flex; align-items: flex-start; gap: 11px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-icon { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,215,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+    .activity-text p { font-size: 0.82rem; font-weight: 600; color: var(--texto-claro); line-height: 1.3; }
+    .activity-text span { font-size: 0.72rem; color: var(--texto-muy-claro); }
+    .goal-item { margin-bottom: 14px; }
+    .goal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .goal-header-left { display: flex; align-items: center; gap: 7px; }
+    .goal-star { width: 26px; height: 26px; border-radius: 7px; background: rgba(255,215,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .goal-name { font-size: 0.82rem; font-weight: 700; color: var(--texto-claro); }
+    .goal-pct { font-size: 0.8rem; font-weight: 800; color: var(--dorado); }
+    .goal-bar { background: rgba(255,255,255,0.08); border-radius: 20px; height: 5px; overflow: hidden; }
+    .goal-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--dorado), var(--naranja)); transition: width 0.8s ease; }
+    .goal-sub { font-size: 0.7rem; color: var(--texto-muy-claro); margin-top: 3px; }
+    .reward-item { display: flex; align-items: center; gap: 11px; padding: 10px; background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.12); border-radius: 12px; margin-bottom: 9px; }
+    .reward-icon { font-size: 1.5rem; width: 40px; text-align: center; }
+    .reward-name { font-size: 0.82rem; font-weight: 700; color: var(--texto-claro); }
+    .reward-date { font-size: 0.7rem; color: var(--texto-muy-claro); }
+    .coins-total { background: rgba(255,215,0,0.08); border-radius: 12px; padding: 12px; text-align: center; margin-top: 4px; }
+    .coins-total .label { font-size: 0.72rem; color: var(--texto-muy-claro); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .coins-total .amount { font-size: 1.6rem; font-weight: 900; color: var(--dorado); }
+    .message-box { background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,215,0,0.2); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .message-box p { font-size: 0.85rem; color: var(--texto-claro); line-height: 1.5; font-style: italic; }
+    .message-author { font-size: 0.75rem; color: var(--dorado); font-weight: 700; margin-top: 6px; }
+    .message-foxy { display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 10px 0; }
+    .btn-send-msg { width: 100%; padding: 10px; background: linear-gradient(135deg, var(--dorado), var(--naranja)); border: none; border-radius: 10px; color: #1a1208; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+    .btn-send-msg:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,215,0,0.25); }
+    .rec-text { font-size: 0.82rem; color: var(--texto-claro); line-height: 1.5; margin-bottom: 14px; }
+    .rec-text strong { color: var(--dorado); }
+    .footer-bar { display: flex; align-items: center; justify-content: center; gap: 40px; padding: 14px 30px; background: rgba(10,20,12,0.8); border-top: 1px solid rgba(255,215,0,0.1); flex-wrap: wrap; }
+    .footer-stat { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; font-weight: 700; color: var(--texto-claro); }
+    .footer-stat span { color: var(--dorado); }
+    .footer-tip { font-size: 0.78rem; color: var(--texto-muy-claro); display: flex; align-items: center; gap: 6px; }
+    .empty-state { text-align: center; padding: 20px 10px; color: var(--texto-muy-claro); font-size: 0.82rem; }
+    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 8px; }
+    .loading-overlay { position: fixed; inset: 0; background: #0a1f12; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 999; }
+    .loading-overlay .spinner { width: 48px; height: 48px; border: 4px solid rgba(255,215,0,0.2); border-top-color: var(--dorado); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay p { color: var(--texto-muy-claro); font-size: 0.9rem; }
+    @media (max-width: 1100px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .hero-card { flex-direction: column; align-items: flex-start; }
+      .hero-right { width: 100%; }
+      .content { padding: 16px; }
+      .topbar { padding: 14px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Cargando panel...</p>
+</div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="images/logo.jpg" alt="Logo" onerror="this.style.display='none'">
+    <span>SENDERO<br>DEL SABER</span>
+  </div>
+
+  <div class="sidebar-profile">
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar-emoji" id="hijóAvatar">🧒</div>
+      <span class="profile-level-badge" id="hijoNivel">Nv. 1</span>
+    </div>
+    <div class="profile-name" id="hijoNombre">Cargando...</div>
+    <div class="profile-role">Tu explorador 🌿</div>
+    <div class="profile-coins" id="hijoMonedas">🪙 0 monedas</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Menú principal</div>
+    <div class="nav-item active" onclick="cambiarVista('resumen', this)"><i class="fas fa-home"></i> Resumen</div>
+    <div class="nav-item" onclick="cambiarVista('progreso', this)"><i class="fas fa-chart-bar"></i> Progreso</div>
+    <div class="nav-item" onclick="cambiarVista('metas', this)"><i class="fas fa-bullseye"></i> Metas</div>
+    <div class="nav-item" onclick="cambiarVista('recompensas', this)"><i class="fas fa-trophy"></i> Recompensas</div>
+    <div class="nav-label">Cuenta</div>
+    <div class="nav-item" onclick="cambiarVista('configuracion', this)"><i class="fas fa-cog"></i> Configuración</div>
+  </nav>
+
+  <div class="sidebar-control">
+    <div class="control-title"><i class="fas fa-shield-alt"></i> Control Parental</div>
+    <div class="usage-label">
+      <span>Actividad reciente</span>
+      <span id="actividadCount">0 acciones</span>
+    </div>
+    <div class="usage-bar">
+      <div class="usage-fill" id="actividadBar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="sidebar-logout" onclick="cerrarSesion()">
+    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>¡Bienvenido, papá/mamá! 🌿</h1>
+      <p id="topbarSubtitle">Este es el progreso de tu explorador</p>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <div class="topbar-user-avatar">🦊</div>
+        <span id="padreNombreTopbar">Cargando...</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="mainContent">
+    <!-- Las vistas se renderizan aquí -->
+  </div>
+
+  <footer class="footer-bar">
+    <div class="footer-stat">🔥 Racha: <span id="footerRacha">0 días</span></div>
+    <div class="footer-stat">🪙 Monedas: <span id="footerMonedas">0</span></div>
+    <div class="footer-stat">⭐ Nivel: <span id="footerNivel">1</span></div>
+    <div class="footer-tip">🌿 Consejo del día: Pequeños pasos cada día, grandes logros siempre.</div>
+  </footer>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://qxwjuevahjrdtvtylexj.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_N7ZF6WW1hC_Ncpc9-7WHSw_XRjM_qi6';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const MATERIAS_CONFIG = {
+  1: { nombre: 'Español',           emoji: '📚', color: '#22c55e', colorLight: 'rgba(74,222,128,0.15)',  barColor: 'linear-gradient(90deg,#22c55e,#4ade80)' },
+  2: { nombre: 'Programación',      emoji: '💻', color: '#fb923c', colorLight: 'rgba(251,146,60,0.15)',   barColor: 'linear-gradient(90deg,#f97316,#fb923c)' },
+  3: { nombre: 'Matemáticas',       emoji: '📐', color: '#60a5fa', colorLight: 'rgba(59,130,246,0.15)',   barColor: 'linear-gradient(90deg,#3b82f6,#60a5fa)' },
+  4: { nombre: 'Lenguaje de señas', emoji: '🤟', color: '#c084fc', colorLight: 'rgba(168,85,247,0.15)',  barColor: 'linear-gradient(90deg,#a855f7,#c084fc)' }
+};
+
+// Datos cargados globalmente para reutilizarlos en las vistas
+let _hijoData = null;
+let _progresosData = null;
+let _actividadData = null;
+let _metasData = null;
+let _recompensasData = null;
+let _padreNombre = '';
+
+function timeAgo(dateStr) {
+  const diff = (Date.now() - new Date(dateStr)) / 1000;
+  if (diff < 60) return 'Hace un momento';
+  if (diff < 3600) return `Hace ${Math.floor(diff/60)} min`;
+  if (diff < 86400) return `Hace ${Math.floor(diff/3600)}h`;
+  if (diff < 172800) return 'Ayer';
+  return new Date(dateStr).toLocaleDateString('es-PA', { day: 'numeric', month: 'short' });
+}
+
+// ── VISTAS ──────────────────────────────────────────────────────────────────
+
+function renderResumen() {
+  const hijo = _hijoData;
+  const progresos = _progresosData;
+  const actividad = _actividadData;
+  const metas = _metasData;
+  const recompensas = _recompensasData;
+
+  const nivel = hijo ? hijo.nivel || 1 : 1;
+  const exp = hijo ? hijo.exp || 0 : 0;
+  const expMax = nivel * 1000;
+  const expPct = Math.min(Math.round((exp / expMax) * 100), 100);
+  const monedas = hijo ? hijo.monedas || 0 : 0;
+  const matsCount = progresos ? progresos.length : 0;
+
+  const heroSubtitle = matsCount > 0
+    ? `Está avanzando en <span class="highlight">${matsCount} materia${matsCount > 1 ? 's' : ''}</span>.<br>¡Sigue motivándolo para llegar al siguiente nivel!`
+    : `Aún no ha comenzado ninguna materia.<br>¡Motívalo a entrar al sendero!`;
+
+  return `
+    <div class="hero-card">
+      <div class="hero-left">
+        <div class="hero-foxy">🦊</div>
+        <div class="hero-text">
+          <h2>${hijo ? '¡' + hijo.nombre + ' sigue avanzando!' : '¡Tu explorador sigue avanzando!'}</h2>
+          <p>${heroSubtitle}</p>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="level-shield">${nivel}</div>
+        <div class="exp-section">
+          <p>Nivel actual</p>
+          <div class="exp-bar"><div class="exp-fill" style="width:${expPct}%"></div></div>
+          <span>${exp} / ${expMax} EXP</span>
+        </div>
+      </div>
+    </div>
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-book-open"></i> Progreso por materia</h3></div>
+        ${renderProgresoMaterias(progresos)}
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-clock"></i> Actividad reciente</h3></div>
+        ${renderActividad(actividad)}
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-lightbulb"></i> Recomendaciones</h3></div>
+        <p class="rec-text">${renderRecomendacion(hijo, progresos)}</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-bullseye"></i> Metas activas</h3></div>
+        ${renderMetas(metas)}
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-trophy"></i> Recompensas</h3></div>
+        ${renderRecompensas(recompensas)}
+        <div class="coins-total">
+          <div class="label">Total de monedas</div>
+          <div class="amount">🪙 ${monedas.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-envelope-open-text"></i> Mensaje para ${hijo ? hijo.nombre : 'tu explorador'}</h3></div>
+        <div class="message-box">
+          <p id="msgTexto">"¡Sigue así, eres increíble!<br>Estoy muy orgulloso de ti."</p>
+          <div class="message-author">— ${_padreNombre} 💚</div>
+        </div>
+        <div class="message-foxy">🦊💌</div>
+        <button class="btn-send-msg" onclick="abrirEnviarMensaje()"><i class="fas fa-paper-plane"></i> Enviar nuevo mensaje</button>
+      </div>
+    </div>`;
+}
+
+function renderProgreso() {
+  return `
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:1.3rem;font-weight:800">📊 Progreso detallado</h2>
+      <p style="color:var(--texto-muy-claro);font-size:0.85rem;margin-top:4px">Avance de tu explorador en cada materia</p>
+    </div>
+    <div class="dashboard-grid" style="grid-template-columns:1fr 1fr">
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-title"><h3><i class="fas fa-book-open"></i> Materias</h3></div>
+        ${renderProgresoMaterias(_progresosData)}
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-clock"></i> Actividad reciente</h3></div>
+        ${renderActividad(_actividadData)}
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-lightbulb"></i> Recomendaciones</h3></div>
+        <p class="rec-text">${renderRecomendacion(_hijoData, _progresosData)}</p>
+      </div>
+    </div>`;
+}
+
+function renderMetasVista() {
+  return `
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:1.3rem;font-weight:800">🎯 Metas activas</h2>
+      <p style="color:var(--texto-muy-claro);font-size:0.85rem;margin-top:4px">Objetivos que tu explorador está persiguiendo</p>
+    </div>
+    <div class="dashboard-grid" style="grid-template-columns:1fr 1fr">
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-title"><h3><i class="fas fa-bullseye"></i> Metas en curso</h3></div>
+        ${renderMetas(_metasData)}
+      </div>
+    </div>`;
+}
+
+function renderRecompensasVista() {
+  const monedas = _hijoData ? _hijoData.monedas || 0 : 0;
+  return `
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:1.3rem;font-weight:800">🏆 Recompensas ganadas</h2>
+      <p style="color:var(--texto-muy-claro);font-size:0.85rem;margin-top:4px">Todo lo que tu explorador ha conquistado</p>
+    </div>
+    <div class="dashboard-grid" style="grid-template-columns:1fr 1fr">
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-trophy"></i> Logros</h3></div>
+        ${renderRecompensas(_recompensasData)}
+        <div class="coins-total">
+          <div class="label">Total de monedas</div>
+          <div class="amount">🪙 ${monedas.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-coins"></i> Resumen de monedas</h3></div>
+        <div style="text-align:center;padding:30px 0">
+          <div style="font-size:4rem">🪙 ${monedas.toLocaleString()}</div>
+          <div style="font-size:0.85rem;color:var(--texto-muy-claro);margin-top:8px">monedas acumuladas</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderConfiguracion() {
+  return `
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:1.3rem;font-weight:800">⚙️ Configuración</h2>
+      <p style="color:var(--texto-muy-claro);font-size:0.85rem;margin-top:4px">Ajusta las preferencias del panel</p>
+    </div>
+    <div class="dashboard-grid" style="grid-template-columns:1fr 1fr">
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-bell"></i> Notificaciones</h3></div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          ${['Alertas de actividad','Logros nuevos','Mensajes de Foxy'].map(n => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.04);border-radius:10px">
+            <span style="font-size:0.85rem;font-weight:600">${n}</span>
+            <div style="width:42px;height:24px;background:var(--dorado);border-radius:20px;cursor:pointer;position:relative">
+              <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px"></div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><h3><i class="fas fa-shield-alt"></i> Control parental</h3></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="padding:12px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:12px">
+            <div style="font-size:0.82rem;font-weight:700;color:var(--dorado);margin-bottom:6px">Tiempo máximo de uso</div>
+            <div style="font-size:0.78rem;color:var(--texto-muy-claro)">Funcionalidad próximamente disponible 🔜</div>
+          </div>
+          <div style="padding:12px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:12px">
+            <div style="font-size:0.82rem;font-weight:700;color:var(--dorado);margin-bottom:6px">Islas permitidas</div>
+            <div style="font-size:0.78rem;color:var(--texto-muy-claro)">Funcionalidad próximamente disponible 🔜</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── HELPERS DE CONTENIDO ─────────────────────────────────────────────────────
+
+function renderProgresoMaterias(progresos) {
+  if (!progresos || progresos.length === 0)
+    return '<div class="empty-state"><div class="empty-icon">📚</div>Sin progreso registrado aún</div>';
+  return progresos.map(p => {
+    const cfg = MATERIAS_CONFIG[p.materia_id] || { nombre: 'Materia', emoji: '📖', colorLight: 'rgba(255,255,255,0.1)', barColor: '#FFD700', color: '#FFD700' };
+    const pct = Math.min(p.porcentaje || 0, 100);
+    return `
+      <div class="subject-row">
+        <div class="subject-icon" style="background:${cfg.colorLight}">${cfg.emoji}</div>
+        <div class="subject-info">
+          <div class="subject-name">
+            <span>${cfg.nombre}</span>
+            <span class="subject-pct" style="color:${cfg.color}">${pct}%</span>
+          </div>
+          <div class="subject-bar">
+            <div class="subject-bar-fill" style="width:${pct}%;background:${cfg.barColor}"></div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderActividad(actividad) {
+  if (!actividad || actividad.length === 0)
+    return '<div class="empty-state"><div class="empty-icon">⏳</div>Sin actividad registrada aún</div>';
+  const iconos = { 'video': '🎥', 'ejercicio': '📝', 'logro': '🏆', 'practica': '✏️', 'inicio': '🎮', 'completado': '✅' };
+  return actividad.map(a => `
+    <div class="activity-item">
+      <div class="activity-icon">${iconos[a.tipo] || '📌'}</div>
+      <div class="activity-text">
+        <p>${a.descripcion || 'Actividad en la plataforma'}</p>
+        <span>${timeAgo(a.created_at)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderMetas(metas) {
+  if (!metas || metas.length === 0)
+    return '<div class="empty-state"><div class="empty-icon">🎯</div>Sin metas activas aún</div>';
+  return metas.map(m => {
+    const pct = m.objetivo > 0 ? Math.min(Math.round((m.progreso / m.objetivo) * 100), 100) : 0;
+    const completa = m.completada || pct >= 100;
+    const fechaStr = m.fecha_limite ? `📅 Límite: ${new Date(m.fecha_limite).toLocaleDateString('es-PA', { day: 'numeric', month: 'short' })}` : '';
+    return `
+      <div class="goal-item">
+        <div class="goal-header">
+          <div class="goal-header-left">
+            <div class="goal-star">${completa ? '✅' : '⭐'}</div>
+            <span class="goal-name">${m.descripcion}</span>
+          </div>
+          <span class="goal-pct" style="${completa ? 'color:#4ade80' : ''}">${pct}%</span>
+        </div>
+        <div class="goal-bar">
+          <div class="goal-bar-fill" style="width:${pct}%;${completa ? 'background:linear-gradient(90deg,#22c55e,#4ade80)' : ''}"></div>
+        </div>
+        <div class="goal-sub">${m.progreso} / ${m.objetivo} completados ${fechaStr}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderRecompensas(recompensas) {
+  if (!recompensas || recompensas.length === 0)
+    return '<div class="empty-state"><div class="empty-icon">🏆</div>Aún no ha ganado recompensas</div>';
+  return recompensas.map(r => `
+    <div class="reward-item">
+      <div class="reward-icon">${r.emoji || '🏅'}</div>
+      <div>
+        <div class="reward-name">${r.nombre}</div>
+        <div class="reward-date">${r.descripcion || ''} · ${timeAgo(r.created_at)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderRecomendacion(hijo, progresos) {
+  if (!hijo || !progresos || progresos.length === 0)
+    return 'Cuando tu explorador comience a aprender, aquí aparecerán recomendaciones personalizadas. 🌟';
+  const materiasBaja = progresos.filter(p => (p.porcentaje || 0) < 50);
+  if (materiasBaja.length > 0) {
+    const cfg = MATERIAS_CONFIG[materiasBaja[0].materia_id];
+    return `A <strong>${hijo.nombre}</strong> le vendría bien reforzar <strong>${cfg ? cfg.nombre : 'algunas materias'}</strong>. ¡Anímalo a practicar más! 💪`;
+  }
+  return `¡<strong>${hijo.nombre}</strong> va muy bien en todas las materias! Sigue motivándolo para llegar al siguiente nivel. 🌟`;
+}
+
+// ── CAMBIAR VISTA ────────────────────────────────────────────────────────────
+
+function cambiarVista(vista, el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+
+  const vistas = {
+    resumen:       renderResumen,
+    progreso:      renderProgreso,
+    metas:         renderMetasVista,
+    recompensas:   renderRecompensasVista,
+    configuracion: renderConfiguracion
+  };
+
+  document.getElementById('mainContent').innerHTML = (vistas[vista] || vistas.resumen)();
+}
+
+function abrirEnviarMensaje() {
+  const msg = prompt('✍️ Escribe tu mensaje para tu explorador:');
+  if (msg && msg.trim()) {
+    const el = document.getElementById('msgTexto');
+    if (el) el.innerHTML = `"${msg.trim()}"`;
+  }
+}
+
+// ── CARGA DE DATOS ───────────────────────────────────────────────────────────
+
+async function cargarDashboard() {
+  const padreId = localStorage.getItem('usuarioActualId');
+  if (!padreId) { window.location.href = 'index.html'; return; }
+
+  const { data: padre } = await db.from('usuarios').select('*').eq('id', padreId).maybeSingle();
+  if (!padre) { window.location.href = 'index.html'; return; }
+
+  _padreNombre = padre.nombre;
+  document.getElementById('padreNombreTopbar').textContent = padre.nombre;
+
+  const { data: vinculo } = await db.from('padre_hijo').select('estudiante_id').eq('padre_id', padreId).maybeSingle();
+
+  if (!vinculo) {
+    document.getElementById('hijoNombre').textContent = 'Sin explorador';
+    document.getElementById('mainContent').innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:var(--texto-muy-claro)">
+        <div style="font-size:3rem;margin-bottom:16px">🔗</div>
+        <div style="font-size:1.1rem;font-weight:800;color:var(--blanco);margin-bottom:8px">¡Vincula a tu explorador!</div>
+        <div style="font-size:0.88rem">Pídele a tu hijo que te dé su código y regístrate con él para ver su progreso.</div>
+      </div>`;
+    document.getElementById('loadingOverlay').style.display = 'none';
+    return;
+  }
+
+  const { data: hijo } = await db.from('usuarios').select('*').eq('id', vinculo.estudiante_id).maybeSingle();
+  if (!hijo) { document.getElementById('loadingOverlay').style.display = 'none'; return; }
+
+  _hijoData = hijo;
+
+  const nivel = hijo.nivel || 1;
+  const monedas = hijo.monedas || 0;
+
+  document.getElementById('hijoNombre').textContent = hijo.nombre;
+  document.getElementById('hijoNivel').textContent = `Nv. ${nivel}`;
+  document.getElementById('hijoMonedas').textContent = `🪙 ${monedas.toLocaleString()} monedas`;
+  document.getElementById('footerMonedas').textContent = monedas.toLocaleString();
+  document.getElementById('footerNivel').textContent = nivel;
+  if (hijo.racha_dias !== undefined)
+    document.getElementById('footerRacha').textContent = `${hijo.racha_dias} días`;
+
+  // Cargar todos los datos en paralelo
+  const [progRes, actRes, metRes, recRes] = await Promise.all([
+    db.from('progreso_materia').select('*').eq('estudiante_id', hijo.id),
+    db.from('actividad_log').select('*').eq('estudiante_id', hijo.id).order('created_at', { ascending: false }).limit(5),
+    db.from('metas').select('*').eq('estudiante_id', hijo.id).eq('completada', false).limit(3),
+    db.from('recompensas').select('*').eq('estudiante_id', hijo.id).order('created_at', { ascending: false }).limit(3)
+  ]);
+
+  _progresosData  = progRes.data;
+  _actividadData  = actRes.data;
+  _metasData      = metRes.data;
+  _recompensasData = recRes.data;
+
+  // Barra control parental
+  if (_actividadData && _actividadData.length > 0) {
+    document.getElementById('actividadBar').style.width = Math.min((_actividadData.length / 10) * 100, 100) + '%';
+    document.getElementById('actividadCount').textContent = `${_actividadData.length} acciones`;
+  }
+
+  // Renderizar vista inicial (Resumen)
+  document.getElementById('mainContent').innerHTML = renderResumen();
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function cerrarSesion() {
+  localStorage.removeItem('usuarioActualId');
+  window.location.href = 'index.html';
+}
+
+cargarDashboard();
+</script>
+</body>
+</html>

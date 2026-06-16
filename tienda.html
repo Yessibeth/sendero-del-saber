@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda | Sendero del Saber</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --gold: #FFD700;
+      --gold-dark: #e6b800;
+      --coin: #FFC107;
+      --bg: #0f0c1a;
+      --bg2: #1a1530;
+      --card: #231d3a;
+      --card-hover: #2d2550;
+      --border: #3d3460;
+      --text: #f0eaff;
+      --text-muted: #9d93c0;
+      --green: #4ade80;
+      --purple: #a855f7;
+      --pink: #f472b6;
+      --blue: #60a5fa;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Fondo animado con estrellas */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(96,165,250,0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 12, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-back {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-back:hover { background: var(--card-hover); color: var(--text); }
+
+    .topbar-title {
+      font-family: 'Gasoek One', sans-serif;
+      font-size: 22px;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    .coins-display {
+      background: linear-gradient(135deg, #3d2f00, #5a4500);
+      border: 2px solid var(--gold);
+      border-radius: 50px;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--gold);
+      box-shadow: 0 0 20px rgba(255,215,0,0.2);
+    }
+    .coins-display span.icon { font-size: 22px; }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 48px 20px 32px;
+    }
+
+    .hero h1 {
+      font-family: 'Gasoek One', sans-serif;
+      font-size: clamp(32px, 6vw, 56px);
+      background: linear-gradient(135deg, var(--gold), var(--pink), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      line-height: 1.1;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 16px;
+      font-weight: 600;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* ─── AVATAR EQUIPADO ─── */
+    .equipped-banner {
+      position: relative;
+      z-index: 1;
+      margin: 0 auto 40px;
+      max-width: 340px;
+      background: linear-gradient(135deg, var(--card), var(--card-hover));
+      border: 2px solid var(--purple);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 8px 32px rgba(168,85,247,0.2);
+    }
+
+    .equipped-avatar-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--purple);
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      overflow: hidden;
+    }
+
+    .equipped-info h3 {
+      font-size: 13px;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .equipped-info p {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    /* ─── GRID DE AVATARES ─── */
+    .shop-section {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    .section-label {
+      font-family: 'Gasoek One', sans-serif;
+      font-size: 20px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .avatars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    /* ─── CARD ─── */
+    .avatar-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 16px 20px;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.03));
+      pointer-events: none;
+    }
+
+    .avatar-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: var(--purple);
+      box-shadow: 0 16px 40px rgba(168,85,247,0.25);
+    }
+
+    .avatar-card.owned {
+      border-color: var(--green);
+    }
+    .avatar-card.owned:hover {
+      border-color: var(--green);
+      box-shadow: 0 16px 40px rgba(74,222,128,0.2);
+    }
+
+    .avatar-card.equipped-card {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, var(--card), #2a2310);
+    }
+    .avatar-card.equipped-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 16px 40px rgba(255,215,0,0.25);
+    }
+
+    /* Imagen del avatar */
+    .avatar-img-wrap {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 3px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: border-color 0.3s;
+      position: relative;
+    }
+
+    .avatar-card.owned .avatar-img-wrap { border-color: var(--green); }
+    .avatar-card.equipped-card .avatar-img-wrap { border-color: var(--gold); }
+    .avatar-card:not(.owned):not(.equipped-card):hover .avatar-img-wrap { border-color: var(--purple); }
+
+    .avatar-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-img-wrap .emoji-fallback {
+      font-size: 52px;
+    }
+
+    /* Badge de estado */
+    .status-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-equipped {
+      background: rgba(255,215,0,0.2);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+    }
+    .badge-owned {
+      background: rgba(74,222,128,0.15);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    /* Nombre */
+    .avatar-name {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+
+    /* Botón de acción */
+    .btn-action {
+      width: 100%;
+      padding: 11px 0;
+      border-radius: 12px;
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-buy {
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+      color: white;
+      box-shadow: 0 4px 16px rgba(168,85,247,0.35);
+    }
+    .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(168,85,247,0.5); }
+    .btn-buy:disabled {
+      background: var(--bg2);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-equip {
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      color: white;
+      box-shadow: 0 4px 16px rgba(74,222,128,0.3);
+    }
+    .btn-equip:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,222,128,0.45); }
+
+    .btn-equipped {
+      background: linear-gradient(135deg, #3d2f00, #5a4500);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      cursor: default;
+    }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 32px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      transform: scale(0.85);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+    .modal-overlay.show .modal { transform: scale(1); }
+
+    .modal-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 3px solid var(--purple);
+      margin: 0 auto 20px;
+      overflow: hidden;
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+    }
+    .modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .modal h2 {
+      font-family: 'Gasoek One', sans-serif;
+      font-size: 26px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .modal p { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; font-weight: 600; }
+
+    .modal-price {
+      background: rgba(255,215,0,0.1);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 24px;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 12px;
+    }
+    .btn-cancel {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { background: var(--card-hover); color: var(--text); }
+
+    .btn-confirm {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+      border: none;
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(168,85,247,0.4);
+    }
+    .btn-confirm:hover { transform: translateY(-2px); }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 24px;
+      font-weight: 700;
+      font-size: 15px;
+      z-index: 300;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--green); color: var(--green); }
+    .toast.error { border-color: #f87171; color: #f87171; }
+
+    /* ─── LOADING ─── */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 400;
+      gap: 16px;
+      transition: opacity 0.5s;
+    }
+    .loading-screen.hide { opacity: 0; pointer-events: none; }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-screen p {
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    /* ─── MONEDAS INSUFICIENTES ─── */
+    .no-coins {
+      font-size: 12px;
+      color: #f87171;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      .topbar { padding: 12px 16px; }
+      .topbar-title { font-size: 17px; }
+      .coins-display { font-size: 15px; padding: 7px 14px; }
+      .avatars-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .avatar-img-wrap { width: 80px; height: 80px; }
+      .hero { padding: 32px 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <p>Cargando tienda...</p>
+</div>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="btn-back" onclick="window.location.href='index.html'">← Volver</button>
+    <span class="topbar-title">🛒 Tienda</span>
+  </div>
+  <div class="coins-display">
+    <span class="icon">🪙</span>
+    <span id="coinsDisplay">...</span>
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>¡Elige tu Avatar!</h1>
+  <p>Gana monedas completando misiones y personaliza tu aventura</p>
+</div>
+
+<!-- Avatar equipado actual -->
+<div class="equipped-banner" id="equippedBanner">
+  <div class="equipped-avatar-img" id="equippedPreview">⏳</div>
+  <div class="equipped-info">
+    <h3>✨ Tu avatar actual</h3>
+    <p id="equippedName">Cargando...</p>
+  </div>
+</div>
+
+<!-- Grid de avatares -->
+<div class="shop-section">
+  <div class="section-label">🎭 Todos los avatares</div>
+  <div class="avatars-grid" id="avatarsGrid">
+    <!-- Se llena con JS -->
+  </div>
+</div>
+
+<!-- Modal de compra -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-avatar" id="modalAvatar">🎭</div>
+    <h2 id="modalName">Avatar</h2>
+    <p>¿Quieres comprar este avatar?</p>
+    <div class="modal-price" id="modalPrice">50 🪙</div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-confirm" id="btnConfirm" onclick="confirmBuy()">¡Comprar!</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ══════════════════════════════════════════
+  // CONFIGURACIÓN — pon tus credenciales aquí
+  // ══════════════════════════════════════════
+  const SUPABASE_URL = 'https://qxwjuevahjrdtvtylexj.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_N7ZF6WW1hC_Ncpc9-7WHSw_XRjM_qi6';
+  // Emojis de respaldo por si la imagen no carga
+  const EMOJI_MAP = {
+    'Capitan Foxy':   '🏴‍☠️',
+    'Roccoe':  '🦝',
+    'Kitty':   '🐱',
+    'Cofre':    '📦',
+    'Estrella': '⭐',
+    'Brisa':  '🐶',
+    'Foxy':     '🦊'
+  };
+
+  // ══════════════════════════════════════════
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentUser   = null;   // fila de usuarios
+  let allAvatars    = [];     // catálogo
+  let ownedIds      = new Set();
+  let equippedId    = null;
+  let pendingAvatar = null;   // el que se está por comprar
+
+  // ── INICIO ──────────────────────────────
+  window.addEventListener('DOMContentLoaded', init);
+
+  async function init() {
+    // 1) Sesión de Supabase Auth
+    const savedId = localStorage.getItem('usuarioActualId');
+if (!savedId) { window.location.href = 'index.html'; return; }
+
+    // 2) Datos del usuario
+    const { data: u } = await sb
+      .from('usuarios')
+      .select('*')
+      .eq('id', savedId)
+      .single();
+    currentUser = u;
+
+    // 3) Avatares que ya posee
+    const { data: compras } = await sb
+  .from('avatares_comprados')
+  .select('avatar_id')
+  .eq('estudiante_id', savedId);
+
+    ownedIds = new Set((compras || []).map(c => c.avatar_id));
+
+    // 4) Avatar equipado (guardado en columna avatar_equipado de usuarios)
+    equippedId = currentUser?.avatar_equipado || null;
+
+    // 5) Catálogo de avatares
+    const { data: avs } = await sb.from('avatares').select('*').order('precio');
+    allAvatars = avs || [];
+
+    // 6) Render
+    renderCoins();
+    renderEquipped();
+    renderGrid();
+
+    // Ocultar loading
+    const ls = document.getElementById('loadingScreen');
+    ls.classList.add('hide');
+    setTimeout(() => ls.remove(), 600);
+  }
+
+  // ── RENDER MONEDAS ───────────────────────
+  function renderCoins() {
+    document.getElementById('coinsDisplay').textContent = currentUser?.monedas ?? 0;
+  }
+
+  // ── RENDER AVATAR EQUIPADO ───────────────
+  function renderEquipped() {
+    const av = allAvatars.find(a => a.id === equippedId) || allAvatars[0];
+    const nameEl    = document.getElementById('equippedName');
+    const previewEl = document.getElementById('equippedPreview');
+    if (!av) return;
+
+    nameEl.textContent = av.nombre;
+    const img = buildAvatarImg(av, 72);
+    previewEl.innerHTML = '';
+    previewEl.appendChild(img);
+    previewEl.style.background = 'transparent';
+  }
+
+  // ── RENDER GRID ──────────────────────────
+  function renderGrid() {
+    const grid = document.getElementById('avatarsGrid');
+    grid.innerHTML = '';
+
+    allAvatars.forEach(av => {
+      const isOwned    = ownedIds.has(av.id);
+      const isEquipped = av.id === equippedId;
+
+      const card = document.createElement('div');
+      card.className = 'avatar-card' +
+        (isEquipped ? ' equipped-card' : isOwned ? ' owned' : '');
+
+      // Badge
+      let badge = '';
+      if (isEquipped) badge = `<div class="status-badge badge-equipped">✦ Equipado</div>`;
+      else if (isOwned) badge = `<div class="status-badge badge-owned">✓ Tuyo</div>`;
+
+      // Botón
+      let btn = '';
+      const canAfford = (currentUser?.monedas ?? 0) >= av.precio;
+      if (isEquipped) {
+        btn = `<button class="btn-action btn-equipped" disabled>⭐ Usando</button>`;
+      } else if (isOwned) {
+        btn = `<button class="btn-action btn-equip" onclick="equipAvatar('${av.id}')">Equipar</button>`;
+      } else {
+        btn = `<button class="btn-action btn-buy" onclick="openModal('${av.id}')"
+                 ${!canAfford ? 'disabled' : ''}>
+                  🪙 ${av.precio}
+               </button>
+               ${!canAfford ? '<div class="no-coins">Monedas insuficientes</div>' : ''}`;
+      }
+
+      // Imagen
+      const imgEl = buildAvatarImg(av, 100);
+
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'avatar-img-wrap';
+      imgWrap.appendChild(imgEl);
+
+      card.innerHTML = badge;
+      card.appendChild(imgWrap);
+      card.insertAdjacentHTML('beforeend', `
+        <div class="avatar-name">${av.nombre}</div>
+        ${btn}
+      `);
+
+      grid.appendChild(card);
+    });
+  }
+
+  // ── HELPER: construir img con fallback emoji ─
+  function buildAvatarImg(av, size) {
+    const img = document.createElement('img');
+    // Ajusta la ruta donde guardas tus imágenes
+    img.src = `images/${av.imagen}`;
+    img.alt = av.nombre;
+    img.width = size;
+    img.height = size;
+    img.style.objectFit = 'cover';
+    img.onerror = function() {
+      const span = document.createElement('span');
+      span.className = 'emoji-fallback';
+      span.textContent = EMOJI_MAP[av.nombre] || '🎭';
+      this.replaceWith(span);
+    };
+    return img;
+  }
+
+  // ── MODAL DE COMPRA ──────────────────────
+  function openModal(avatarId) {
+    const av = allAvatars.find(a => a.id === avatarId);
+    if (!av) return;
+    pendingAvatar = av;
+
+    const imgEl = buildAvatarImg(av, 110);
+    const avatarWrap = document.getElementById('modalAvatar');
+    avatarWrap.innerHTML = '';
+    avatarWrap.appendChild(imgEl);
+
+    document.getElementById('modalName').textContent  = av.nombre;
+    document.getElementById('modalPrice').textContent = `${av.precio} 🪙`;
+    document.getElementById('modal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+    pendingAvatar = null;
+  }
+
+  // ── CONFIRMAR COMPRA ─────────────────────
+  async function confirmBuy() {
+    if (!pendingAvatar) return;
+
+    const av    = pendingAvatar;
+    const coins = currentUser?.monedas ?? 0;
+
+    if (coins < av.precio) {
+      showToast('¡No tienes suficientes monedas! 😢', 'error');
+      closeModal();
+      return;
+    }
+
+    const btn = document.getElementById('btnConfirm');
+    btn.disabled = true;
+    btn.textContent = 'Comprando...';
+
+    try {
+      // 1) Insertar en avatares_comprados
+      const { error: e1 } = await sb.from('avatares_comprados').insert({
+  estudiante_id: currentUser.id,
+  avatar_id:     av.id,
+});
+      if (e1) throw e1;
+
+      // 2) Descontar monedas
+      const { error: e2 } = await sb.from('usuarios')
+        .update({ monedas: coins - av.precio })
+        .eq('id', currentUser.id);
+      if (e2) throw e2;
+
+      // 3) Actualizar estado local
+      currentUser.monedas -= av.precio;
+      ownedIds.add(av.id);
+
+      closeModal();
+      showToast(`¡${av.nombre} es tuyo! 🎉`, 'success');
+      renderCoins();
+      renderGrid();
+
+    } catch (err) {
+      console.error(err);
+      showToast('Error al comprar. Intenta de nuevo.', 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '¡Comprar!';
+  }
+
+  // ── EQUIPAR AVATAR ───────────────────────
+  async function equipAvatar(avatarId) {
+    const { error } = await sb.from('usuarios')
+      .update({ avatar_equipado: avatarId })
+      .eq('id', currentUser.id);
+
+    if (error) { showToast('Error al equipar. Intenta de nuevo.', 'error'); return; }
+
+    equippedId = avatarId;
+    currentUser.avatar_equipado = avatarId;
+
+    const av = allAvatars.find(a => a.id === avatarId);
+    showToast(`¡${av?.nombre} equipado! ✨`, 'success');
+    renderEquipped();
+    renderGrid();
+  }
+
+  // ── TOAST ────────────────────────────────
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Cerrar modal al hacer clic fuera
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>
