@@ -147,18 +147,20 @@
       </div>
 
       <!-- ISLAS FLOTANTES -->
-      <div class="island" id="isla-viento" onclick="abrirMateria(4)">
-        <img src="images/isla-viento.png" alt="Isla Señales Al Viento">
-      </div>
-      <div class="island" id="isla-palabra" onclick="abrirMateria(1)">
-        <img src="images/isla-palabra.png" alt="Isla Palabra Perdida">
-      </div>
-      <div class="island" id="isla-codigo" onclick="abrirMateria(2)">
-        <img src="images/isla-codigo.png" alt="Isla Código Escondido">
-      </div>
-      <div class="island" id="isla-calculo" onclick="abrirMateria(3)">
-        <img src="images/isla-calculo.png" alt="Isla Cálculo Eterno">
-      </div>
+       
+      <!-- ISLAS FLOTANTES -->
+<div class="island" id="isla-viento" onclick="window.location.href='isla-senas.html'">
+  <img src="images/isla-viento.png" alt="Isla Señales Al Viento">
+</div>
+<div class="island" id="isla-palabra" onclick="window.location.href='isla-espanol.html'">
+  <img src="images/isla-palabra.png" alt="Isla Palabra Perdida">
+</div>
+<div class="island" id="isla-codigo" onclick="window.location.href='isla-programacion.html'">
+  <img src="images/isla-codigo.png" alt="Isla Código Escondido">
+</div>
+<div class="island" id="isla-calculo" onclick="window.location.href='isla-matematicas.html'">
+  <img src="images/isla-calculo.png" alt="Isla Cálculo Eterno">
+</div>
     </div>
   </div>
 </div>
@@ -247,72 +249,7 @@ function generarCodigoUnico() {
   return `SEN-${p1}-${p2}`;
 }
 // ========== REGISTRO ==========
-async function registrarUsuario() {
-  const nombre = document.getElementById('regNombre').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const password = document.getElementById('regPassword').value;
-  const rol = currentRole;
-  const codigoPadre = document.getElementById('codigoVinculacion').value.trim();
 
-  if (!nombre || !email || !password) { notifier.showToast('Completa todos los campos', 'warning'); return; }
-  if (password.length < 6) { notifier.showToast('La contraseña debe tener al menos 6 caracteres', 'warning'); return; }
-
-  try {
-    // Verificar si el email ya existe
-    const { data: existing } = await db
-      .from('usuarios')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle();
-
-    if (existing) { notifier.showToast('Ya existe una cuenta con este correo', 'error'); return; }
-
-    if (rol === 'padre' && !codigoPadre) { notifier.showToast('Ingresa el código de vinculación', 'warning'); return; }
-
-    let codigoVinculacion = null;
-
-    if (rol === 'estudiante') {
-      // Generar código único para el estudiante
-      codigoVinculacion = generarCodigoUnico();
-      let existe = true;
-      while (existe) {
-        const { data: check } = await db
-          .from('usuarios')
-          .select('id')
-          .eq('codigo_vinculacion', codigoVinculacion)
-          .maybeSingle();
-        if (!check) existe = false;
-        else codigoVinculacion = generarCodigoUnico();
-      }
-    } else {
-      // Validar código del estudiante
-      const { data: estudianteSnap } = await db
-        .from('usuarios')
-        .select('id')
-        .eq('codigo_vinculacion', codigoPadre)
-        .eq('rol', 'estudiante')
-        .maybeSingle();
-
-      if (!estudianteSnap) { notifier.showToast('Código inválido', 'error'); return; }
-      codigoVinculacion = codigoPadre;
-    }
-    // Insertar nuevo usuario
-    const { error } = await db.from('usuarios').insert({
-      nombre,
-      email,
-      password,   // ⚠️ En producción usa hashing (bcrypt) + Supabase Auth
-      rol,
-      codigo_vinculacion: codigoVinculacion,
-      mis_cursos: []
-    });
-
-    if (error) throw error;
-
-    notifier.showToast(rol === 'estudiante' ? `Registro exitoso. Código: ${codigoVinculacion}` : 'Registro exitoso', 'success');
-    closeRegisterModal();
-    showLoginModal();
-  } catch (error) { alert('Error: ' + error.message); }
-}
 // ========== MOSTRAR SOLO UNA PANTALLA ==========
 function mostrarSoloDashboard(rolDashboard) {
   document.getElementById('mainScreen').style.display = 'none';
@@ -363,10 +300,9 @@ async function iniciarSesion() {
         }
       }, 800);
     } else {
-      document.getElementById('dashPadreUserName').innerText = escapeXSS(usuarioActual.nombre);
-      document.body.classList.add('padre-activo');
-      renderVistaPadre();
-    }
+  localStorage.setItem('usuarioActualId', usuarioActual.id);
+  window.location.href = 'padre-dashboard.html';
+}
 
   } catch (error) { alert('Error: ' + error.message); }
 }
@@ -491,8 +427,8 @@ function initFoxy() {
     '¡Hola! Tu aventura comienza aquí 🌟',
     'Toca las islas para aprender 🏝️',
     '¡Sigue avanzando, campeón! 💪',
-    'Cada ises un sendero nuevo 📚',
-    '¡No olvides el cofre del tesoro! 🎁',
+    'Toca tu insignia para desbloquear nuevos avatares 🛍️',
+    '¡Completa más actividades para ganar muchas monedas! 🪙',
     '¡Tú puedes lograrlo! ⭐'
   ];
   
@@ -552,11 +488,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }, 800);
       } else {
-        document.getElementById('dashboardPadre').style.display = 'block';
-        document.getElementById('dashPadreUserName').innerText = escapeXSS(usuarioActual.nombre);
-        document.body.classList.add('padre-activo');
-        renderVistaPadre();
-      }
+  localStorage.setItem('usuarioActualId', usuarioActual.id);
+  window.location.href = 'padre-dashboard.html';
+}
     }
   }
 });
