@@ -200,6 +200,7 @@
       </div>
       <div class="user-dropdown" id="userDropdown">
         <button class="drop-item tienda" onclick="irTienda()">🛒 Tienda de avatares</button>
+        <button class="drop-item" onclick="window.location.href='perfil.html'">👤 Mi Perfil</button>
         <button class="drop-item" onclick="window.location.href='index.html'">🏝️ Mis islas</button>
         <div class="drop-divider"></div>
         <button class="drop-item salir" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
@@ -311,7 +312,6 @@
 </div>
 
 <footer class="footer-bar">
-  <div class="footer-stat">🔥 Racha: <span class="val" id="footerRacha">0 días</span></div>
   <div class="footer-stat">🪙 Monedas: <span class="val" id="footerMonedas">0</span></div>
   <div class="footer-stat">
     <div class="nivel-badge" id="footerNivel">1</div>
@@ -458,17 +458,12 @@ async function cargarDatos() {
     const nivel = u.nivel || 1, exp = u.exp || 0, expMax = nivel * 1000;
     document.getElementById('nombreTopbar').textContent = u.nombre;
     document.getElementById('foxyNombre').textContent = u.nombre;
-    const hoy = new Date().toISOString().split('T')[0];
-    const ultimoAcceso = u.ultimo_acceso || '';
-    if (ultimoAcceso !== hoy) {
-      const ayer = new Date(); ayer.setDate(ayer.getDate() - 1);
-      const ayerStr = ayer.toISOString().split('T')[0];
-      const nuevaRacha = (ultimoAcceso === ayerStr) ? (u.racha_dias || 0) + 1 : 1;
-      await db.from('usuarios').update({ racha_dias: nuevaRacha, ultimo_acceso: hoy }).eq('id', estudianteId);
-      document.getElementById('footerRacha').textContent = `${nuevaRacha} días`;
-    } else {
-      document.getElementById('footerRacha').textContent = `${u.racha_dias || 0} días`;
-    }
+    const mensajePadre = localStorage.getItem('mensajePadre');
+if (mensajePadre) {
+  const burbuja = document.querySelector('.foxy-bubble');
+  if (burbuja) burbuja.textContent = '💌 Mensaje con amor: "' + mensajePadre + '"';
+}
+    
     document.getElementById('footerMonedas').textContent = monedasActuales.toLocaleString();
     document.getElementById('footerNivel').textContent = nivel;
     document.getElementById('footerExpFill').style.width = Math.min((exp / expMax) * 100, 100) + '%';
@@ -693,6 +688,21 @@ async function verificarIslaCompleta() {
     monedasActuales += MONEDAS_POR_ISLA;
     document.getElementById('footerMonedas').textContent = monedasActuales.toLocaleString();
     await db.from('usuarios').update({ monedas: monedasActuales }).eq('id', estudianteId);
+    const { data: metaIslas } = await db.from('metas')
+    .select('*')
+    .eq('estudiante_id', estudianteId)
+    .eq('descripcion', 'Completa 2 islas')
+    .maybeSingle();
+
+if (metaIslas) {
+    const nuevoProgreso = (metaIslas.progreso || 0) + 1;
+    await db.from('metas')
+        .update({ 
+            progreso: nuevoProgreso, 
+            completada: nuevoProgreso >= 2 
+        })
+        .eq('id', metaIslas.id);
+}
     await guardarProgreso();
     setTimeout(() => mostrarCelebracion(MONEDAS_POR_ISLA, true, '¡Isla completada!', '🏆'), 1500);
   }
