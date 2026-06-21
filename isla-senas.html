@@ -416,6 +416,7 @@
     </div>
     <div class="user-dropdown" id="userDropdown">
       <button class="drop-item tienda" onclick="irTienda()">🛒 Tienda de avatares</button>
+      <button class="drop-item" onclick="window.location.href='perfil.html'">👤 Mi Perfil</button>
       <button class="drop-item" onclick="window.location.href='index.html'">🏝️ Mis islas</button>
       <div class="drop-divider"></div>
       <button class="drop-item salir" onclick="cerrarSesion()">
@@ -519,7 +520,6 @@
   </aside>
 </div>
 <footer class="footer-bar">
-  <div class="footer-stat">🔥 Racha: <span class="val" id="footerRacha">0 días</span></div>
   <div class="footer-stat">🪙 Monedas: <span class="val" id="footerMonedas">0</span></div>
   <div class="footer-stat">
     <div class="nivel-badge" id="footerNivel">1</div>
@@ -675,27 +675,10 @@ if (u.avatar_equipado) {
   }
 }
     document.getElementById('foxyNombre').textContent    = u.nombre;
-    document.getElementById('footerRacha').textContent   = `${u.racha_dias || 0} días`;
-    document.getElementById('footerRacha').textContent=`${u.racha_dias||0} días`;
-
-// Lógica de racha
-const hoy = new Date().toISOString().split('T')[0];
-const ultimoAcceso = u.ultimo_acceso || '';
-if(ultimoAcceso !== hoy){
-  const ayer = new Date();
-  ayer.setDate(ayer.getDate() - 1);
-  const ayerStr = ayer.toISOString().split('T')[0];
-  let nuevaRacha;
-  if(ultimoAcceso === ayerStr){
-    nuevaRacha = (u.racha_dias || 0) + 1;
-  } else {
-    nuevaRacha = 1;
-  }
-  await db.from('usuarios').update({
-    racha_dias: nuevaRacha,
-    ultimo_acceso: hoy
-  }).eq('id', estudianteId);
-  document.getElementById('footerRacha').textContent = `${nuevaRacha} días`;
+    const mensajePadre = localStorage.getItem('mensajePadre');
+if (mensajePadre) {
+  const burbuja = document.querySelector('.foxy-bubble');
+  if (burbuja) burbuja.textContent = '💌 Mensaje con amor: "' + mensajePadre + '"';
 }
 
 document.getElementById('footerMonedas').textContent=monedasActuales.toLocaleString();
@@ -970,15 +953,21 @@ async function finalizarActividad() {
         .eq('estudiante_id', estudianteId)
         .eq('descripcion', 'Acumula 100 monedas');
 
-    await db.from('metas')
-        .update({ progreso: expNueva, completada: expNueva >= 1000 })
-        .eq('estudiante_id', estudianteId)
-        .eq('descripcion', 'Sube al nivel 2');
+    const { data: metaIslas } = await db.from('metas')
+    .select('*')
+    .eq('estudiante_id', estudianteId)
+    .eq('descripcion', 'Completa 2 islas')
+    .maybeSingle();
 
+if (metaIslas) {
+    const nuevoProgreso = (metaIslas.progreso || 0) + 1;
     await db.from('metas')
-        .update({ progreso: 1, completada: true })
-        .eq('estudiante_id', estudianteId)
-        .eq('descripcion', 'Completa tu primera isla');
+        .update({ 
+            progreso: nuevoProgreso, 
+            completada: nuevoProgreso >= 2 
+        })
+        .eq('id', metaIslas.id);
+}
 
     await guardarProgreso();
     setTimeout(() => mostrarCelebracion(MONEDAS_POR_ISLA, true, '¡Isla completada!', '🏆'), 1500);
