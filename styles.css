@@ -287,10 +287,16 @@ body {
 }
 
 .success-stories h2 {
+  font-family: 'Gasoek One', cursive;
   text-align: center;
   font-size: 2rem;
   margin-bottom: 40px;
   color: #FFD700;
+  letter-spacing: 1px;
+  -webkit-text-stroke: 2px #0a1428;
+  text-shadow: 
+    0 2px 0 #0a1428,
+    0 4px 10px rgba(0,0,0,0.6);
 }
 
 .stories-grid {
@@ -1235,6 +1241,11 @@ body {
   color: #fff;
   margin-bottom: 16px;
   letter-spacing: 1px;
+  -webkit-text-stroke: 2px #0a1428;
+  text-shadow: 
+    0 2px 0 #0a1428,
+    0 4px 8px rgba(0,0,0,0.6),
+    0 0 25px rgba(255,215,0,0.15);
 }
 
 .section-subtitle {
@@ -2230,4 +2241,44 @@ body.estudiante-activo #dashboardEstudiante {
 
 #dashboardPadre .side-menu {
     margin-top: 90px;
+}
+.acerca-section {
+  background: #0d1b2a;
+  padding: 60px 20px;
+  text-align: center;
+  color: white;
+}
+.acerca-section h2 {
+  font-family: 'Gasoek One', sans-serif;
+  color: #f0c040;
+  font-size: 2rem;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+  -webkit-text-stroke: 2px #0a1428;
+  text-shadow: 
+    0 2px 0 #0a1428,
+    0 4px 10px rgba(0,0,0,0.6);
+}
+.vision-mision-grid {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.vm-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #f0c04044;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 380px;
+}
+.vm-card h3 {
+  color: #f0c040;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+.vm-card p {
+  color: #ccc;
+  line-height: 1.6;
+  text-align: justify;
 }
