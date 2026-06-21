@@ -212,6 +212,7 @@
       </div>
       <div class="user-dropdown" id="userDropdown">
         <button class="drop-item tienda" onclick="irTienda()">🛒 Tienda de avatares</button>
+        <button class="drop-item" onclick="window.location.href='perfil.html'">👤 Mi Perfil</button>
         <button class="drop-item" onclick="window.location.href='index.html'">🏝️ Mis islas</button>
         <div class="drop-divider"></div>
         <button class="drop-item salir" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
@@ -309,16 +310,15 @@
     </div>
     <div class="aprende-panel">
       <div class="panel-title">Lo que aprenderás</div>
-      <div class="aprende-item"><div class="aprende-check">✓</div> Suma y resta</div>
-      <div class="aprende-item"><div class="aprende-check">✓</div> Multiplicación y división</div>
-      <div class="aprende-item"><div class="aprende-check">✓</div> Fracciones básicas</div>
-      <div class="aprende-item"><div class="aprende-check">✓</div> Geometría y figuras</div>
+      <div class="aprende-item"><div class="aprende-check">✓</div> Suma</div>
+      <div class="aprende-item"><div class="aprende-check">✓</div> Resta</div>
+      <div class="aprende-item"><div class="aprende-check">✓</div> Multiplicación</div>
+      <div class="aprende-item"><div class="aprende-check">✓</div> División</div>
     </div>
   </aside>
 </div>
 
 <footer class="footer-bar">
-  <div class="footer-stat">🔥 Racha: <span class="val" id="footerRacha">0 días</span></div>
   <div class="footer-stat">🪙 Monedas: <span class="val" id="footerMonedas">0</span></div>
   <div class="footer-stat">
     <div class="nivel-badge" id="footerNivel">1</div>
@@ -364,39 +364,39 @@ const{createClient}=supabase;const db=createClient(SUPABASE_URL,SUPABASE_ANON_KE
 const MATERIA_ID=3,MONEDAS_POR_ISLA=25;
 const PESO_VIDEO=15,PESO_COMPRENDE=10,PESO_PRACTICA=10,PESO_EXPLORA=15;
 
-const AVENTURAS=[
-  {id:1,titulo:'El Poder de los Números',subtitulo:'Suma, resta, multiplica y divide',videoId:'9MK8e7LcHJc',icono:'➕',libre:true},
-  {id:2,titulo:'El Reino de las Fracciones',subtitulo:'Aprende a dividir y compartir',videoId:'Vqy2AqVULNg',icono:'½',libre:true},
-  {id:3,titulo:'El Mapa de la Geometría',subtitulo:'Figuras, ángulos y perímetros',videoId:null,icono:'📐',libre:false},
-  {id:4,titulo:'El Castillo del Álgebra',subtitulo:'Ecuaciones y variables simples',videoId:null,icono:'🔢',libre:false},
-  {id:5,titulo:'La Estadística Secreta',subtitulo:'Promedios, moda y mediana',videoId:null,icono:'📊',libre:false},
-  {id:6,titulo:'El Gran Calculista',subtitulo:'¡Resuelve todos los retos!',videoId:null,icono:'🏆',libre:false}
+  const AVENTURAS = [
+  {id:1,titulo:'La Aventura de la Suma',subtitulo:'Aprende a sumar',videoId:'VIDEO_SUMA',icono:'➕',libre:true},
+  {id:2,titulo:'El Desafío de la Resta',subtitulo:'Aprende a restar',videoId:'VIDEO_RESTA',icono:'➖',libre:true},
+  {id:3,titulo:'El Mundo de la Multiplicación',subtitulo:'Aprende las tablas',videoId:'VIDEO_MULTIPLICACION',icono:'✖️',libre:false},
+  {id:4,titulo:'La Isla de la División',subtitulo:'Aprende a dividir',videoId:'VIDEO_DIVISION',icono:'➗',libre:false}
 ];
 
 const AVENTURAS_ACTIVAS=AVENTURAS.filter(av=>av.libre);
 const TOTAL_PASOS=AVENTURAS_ACTIVAS.length*4;
 
-const PREGUNTAS={
-  comprende:[
+const PREGUNTAS = {
+  comprende: [
     {operacion:'25 + 38 = ?',texto:'¿Cuánto es 25 más 38?',opciones:['53','63','62','73'],correcta:1},
+    {operacion:'84 - 29 = ?',texto:'¿Cuánto es 84 menos 29?',opciones:['55','45','65','54'],correcta:0},
     {operacion:'7 × 8 = ?',texto:'¿Cuánto es 7 multiplicado por 8?',opciones:['54','56','58','64'],correcta:1},
     {operacion:'144 ÷ 12 = ?',texto:'¿Cuánto es 144 dividido entre 12?',opciones:['10','11','12','13'],correcta:2},
-    {operacion:'½ + ¼ = ?',texto:'¿Cuánto es un medio más un cuarto?',opciones:['¾','⅔','1','½'],correcta:0},
-    {operacion:'15² = ?',texto:'¿Cuánto es 15 al cuadrado?',opciones:['175','205','225','215'],correcta:2}
+    {operacion:'9 × 6 = ?',texto:'¿Cuánto es 9 multiplicado por 6?',opciones:['54','45','64','56'],correcta:0}
   ],
-  practica:[
+
+  practica: [
     {texto:'Ana tiene 45 manzanas. Le da 17 a sus amigos. ¿Cuántas le quedan?',opciones:['28','38','27','29'],correcta:0},
-    {texto:'Un cuadrado tiene lados de 9 cm. ¿Cuál es su perímetro?',opciones:['27 cm','36 cm','81 cm','18 cm'],correcta:1},
-    {texto:'Si 6 estudiantes se dividen en grupos de 2, ¿cuántos grupos hay?',opciones:['2','4','3','12'],correcta:2},
-    {texto:'¿Cuánto es el 25% de 200?',opciones:['25','40','50','75'],correcta:2},
-    {texto:'Un rectángulo mide 8 m de largo y 5 m de ancho. ¿Cuál es su área?',opciones:['26 m²','40 m²','13 m²','30 m²'],correcta:1}
+    {texto:'Pedro tiene 8 cajas con 6 lápices cada una. ¿Cuántos lápices tiene?',opciones:['42','48','54','56'],correcta:1},
+    {texto:'36 dulces se reparten entre 6 niños. ¿Cuántos recibe cada uno?',opciones:['4','5','6','7'],correcta:2},
+    {texto:'María tenía 72 monedas y gastó 25. ¿Cuántas le quedan?',opciones:['47','57','37','52'],correcta:0},
+    {texto:'Hay 9 filas con 4 sillas cada una. ¿Cuántas sillas hay en total?',opciones:['36','32','40','28'],correcta:0}
   ],
-  explora:[
+
+  explora: [
     {operacion:'3 × 7',resultado:'21'},
     {operacion:'64 ÷ 8',resultado:'8'},
     {operacion:'12 + 29',resultado:'41'},
-    {operacion:'50 − 17',resultado:'33'},
-    {operacion:'5²',resultado:'25'}
+    {operacion:'50 - 17',resultado:'33'},
+    {operacion:'81 ÷ 9',resultado:'9'}
   ]
 };
 
@@ -426,27 +426,10 @@ async function cargarDatos(){
     const nivel=u.nivel||1,exp=u.exp||0,expMax=nivel*1000;
     document.getElementById('nombreTopbar').textContent=u.nombre;
     document.getElementById('foxyNombre').textContent=u.nombre;
-    document.getElementById('footerRacha').textContent=`${u.racha_dias||0} días`;
-    document.getElementById('footerRacha').textContent=`${u.racha_dias||0} días`;
-
-// Lógica de racha
-const hoy = new Date().toISOString().split('T')[0];
-const ultimoAcceso = u.ultimo_acceso || '';
-if(ultimoAcceso !== hoy){
-  const ayer = new Date();
-  ayer.setDate(ayer.getDate() - 1);
-  const ayerStr = ayer.toISOString().split('T')[0];
-  let nuevaRacha;
-  if(ultimoAcceso === ayerStr){
-    nuevaRacha = (u.racha_dias || 0) + 1;
-  } else {
-    nuevaRacha = 1;
-  }
-  await db.from('usuarios').update({
-    racha_dias: nuevaRacha,
-    ultimo_acceso: hoy
-  }).eq('id', estudianteId);
-  document.getElementById('footerRacha').textContent = `${nuevaRacha} días`;
+    const mensajePadre = localStorage.getItem('mensajePadre');
+if (mensajePadre) {
+  const burbuja = document.querySelector('.foxy-bubble');
+  if (burbuja) burbuja.textContent = '💌 Mensaje con amor: "' + mensajePadre + '"';
 }
 
 document.getElementById('footerMonedas').textContent=monedasActuales.toLocaleString();
@@ -572,7 +555,11 @@ async function finalizarActividad(){
   const monedas=actividadActual==='explora'?15:10;
   if(ganó){monedasActuales+=monedas;document.getElementById('footerMonedas').textContent=monedasActuales.toLocaleString();}
   actualizarCirculo();renderLista();await guardarProgreso();
-  if(calcularPorcentaje()===100){monedasActuales+=MONEDAS_POR_ISLA;document.getElementById('footerMonedas').textContent=monedasActuales.toLocaleString();await db.from('usuarios').update({monedas:monedasActuales}).eq('id',estudianteId);await guardarProgreso();setTimeout(()=>mostrarCelebracion(MONEDAS_POR_ISLA,true,'¡Isla completada!','🏆'),1500);}
+  if(calcularPorcentaje()===100){monedasActuales+=MONEDAS_POR_ISLA;document.getElementById('footerMonedas').textContent=monedasActuales.toLocaleString();
+  await db.from('usuarios').update({monedas:monedasActuales}).eq('id',estudianteId);
+const { data: metaIslas } = await db.from('metas').select('*').eq('estudiante_id',estudianteId).eq('descripcion','Completa 2 islas').maybeSingle();
+if(metaIslas){const nuevoProgreso=(metaIslas.progreso||0)+1;await db.from('metas').update({progreso:nuevoProgreso,completada:nuevoProgreso>=2}).eq('id',metaIslas.id);}
+await guardarProgreso();setTimeout(()=>mostrarCelebracion(MONEDAS_POR_ISLA,true,'¡Isla completada!','🏆'),1500);}
   if(ganó){mostrarCelebracion(monedas,false,`¡${nom} completado!`,'🎉');lanzarConfeti();}
   else{document.getElementById('celebracionBox').className='celebracion-box';document.getElementById('celebracionEmoji').textContent='📝';document.getElementById('celebracionTitulo').textContent='Actividad completada';document.getElementById('celebracionSub').textContent=`Tuviste ${respuestasCorrectas}/5 correctas. ¡Necesitas 3 para ganar monedas!`;document.getElementById('celebracionMonedas').textContent='Sin monedas esta vez';document.getElementById('celebracionOverlay').classList.add('show');}
 }
