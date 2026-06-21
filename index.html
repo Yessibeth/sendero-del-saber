@@ -26,7 +26,7 @@
   </div>
 
   <!-- HERO (solo imagen de fondo + texto) -->
-  <div class="hero-banner">
+  <div id="inicio" class="hero-banner">
     <canvas id="forestCanvas" class="forest-canvas"></canvas>
     
     <div class="banner-content">
@@ -61,12 +61,32 @@
     <h3>Genesis López</h3>
     <p>"Me gusto el zorrito y tambien que es pirata"</p>
   </div>
-        <!-- Tus story cards aquí -->
-      </div>
+  <div class="story-card">
+    <img src="images/celina.jpeg" alt="celina">
+    <h3>Celina Ibeth</h3>
+    <p>"Es una plataforma que se le presentaría a mi sobrino, diseñada de forma sencilla, interactiva y atractiva para que pueda aprender mientras se divierte. Su contenido está adaptado a su edad, utilizando actividades, juegos y recursos educativos que facilitan la comprensión de los temas y fomentan el interés por el aprendizaje."</p>
+  </div>
+</div>
+      
     </div>
   </div>
   <!-- Resto de tu página (Acerca de, Footer, etc.) --><!-- ← cierre de mainScreen -->
-<footer id="contacto" class="site-footer">
+<div id="acerca" class="acerca-section">
+  <div class="landing-container">
+    <h2>ACERCA DE NOSOTROS</h2>
+    <div class="vision-mision-grid">
+      <div class="vm-card">
+        <h3>Nuestra Misión</h3>
+        <p>Brindar a niños y niñas de Panamá una plataforma educativa interactiva, divertida y accesible, donde puedan aprender a su propio ritmo a través de videos, actividades prácticas y un acompañamiento cercano. Buscamos cerrar la brecha entre el entretenimiento digital y la educación de calidad, ofreciendo un espacio pensado especialmente para ellos, en lugar de adaptado de plataformas para adultos.</p>
+      </div>
+      <div class="vm-card">
+        <h3>Nuestra Visión</h3>
+        <p>Convertirnos en una plataforma educativa de referencia en Panamá, reconocida por hacer del aprendizaje una aventura inclusiva y accesible para todos los niños, incluyendo a quienes se comunican mediante lenguaje de señas. Aspiramos a que cada estudiante encuentre en Sendero del Saber un espacio seguro donde crecer académicamente mientras se divierte, sin importar su ritmo de aprendizaje o sus capacidades.</p>
+      </div>
+    </div>
+  </div>
+</div>
+  <footer id="contacto" class="site-footer">
     <div class="footer-content">
       <img src="images/sendero-del-saber-title.png" alt="SENDERO del SABER" class="footer-logo">
       <p class="footer-subtitle">FIN DEL SENDERO</p>
@@ -74,10 +94,10 @@
         <a href="#inicio">INICIO</a>
         <a href="#cursos">CURSOS</a>
         <a href="#acerca">ACERCA DE</a>
-        <a href="mailto:ysenderodelsaber@gmail.com">CONTÁCTANOS</a>
+        <a href="https://mail.google.com/mail/?view=cm&to=ysenderodelsaber@gmail.com" target="_blank">CONTÁCTANOS</a>
       </nav>
       <div class="footer-social">
-        <a href="https://www.youtube.com/@Facuinform%C3%A1tica/videos" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://youtube.com/@yessibethlopez7947?si=BT6RarOQlsy1QgRO" target="_blank"><i class="fab fa-youtube"></i></a>
         <a href="https://www.instagram.com/ye_sendero_saber?igsh=bDFhcG5pN3c1YXF0" target="_blank"><i class="fab fa-instagram"></i></a>
         <a href="https://pin.it/4XymQlj7B" target="_blank"><i class="fab fa-pinterest"></i></a>
         <a href="https://wa.me/50763912222" target="_blank"><i class="fab fa-whatsapp"></i></a>
@@ -249,6 +269,49 @@ function generarCodigoUnico() {
   return `SEN-${p1}-${p2}`;
 }
 // ========== REGISTRO ==========
+async function registrarUsuario() {
+  const nombre = document.getElementById('regNombre').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+
+  if (!nombre || !email || !password) {
+    notifier.showToast('Completa todos los campos', 'warning');
+    return;
+  }
+
+  const codigo = generarCodigoUnico();
+
+  try {
+    // Verificar si el email ya existe
+    const { data: existe } = await db
+      .from('usuarios')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existe) {
+      notifier.showToast('Ese correo ya está registrado', 'error');
+      return;
+    }
+
+    const { error } = await db.from('usuarios').insert({
+      nombre,
+      email,
+      password,
+      rol: currentRole,
+      codigo_vinculacion: codigo
+    });
+
+    if (error) throw error;
+
+    notifier.showToast('¡Cuenta creada! Ahora inicia sesión', 'success');
+    closeRegisterModal();
+    document.getElementById('loginModal').classList.add('active');
+
+  } catch (error) {
+    notifier.showToast('Error: ' + error.message, 'error');
+  }
+}
 
 // ========== MOSTRAR SOLO UNA PANTALLA ==========
 function mostrarSoloDashboard(rolDashboard) {
@@ -291,14 +354,7 @@ async function iniciarSesion() {
 
     if (usuarioActual.rol === 'estudiante') {
       document.getElementById('dashUserName').innerText = escapeXSS(usuarioActual.nombre);
-      setTimeout(() => {
-        const foxyBubble = document.getElementById('foxy-bubble');
-        const foxyText = document.getElementById('foxy-text');
-        if (foxyBubble && foxyText) {
-          foxyBubble.classList.remove('hidden');
-          foxyText.textContent = '¡Bienvenida ' + escapeXSS(usuarioActual.nombre) + '! Tu aventura comienza aquí 🌟';
-        }
-      }, 800);
+      mostrarMensajeOSaludo(usuarioActual);
     } else {
   localStorage.setItem('usuarioActualId', usuarioActual.id);
   window.location.href = 'padre-dashboard.html';
@@ -453,6 +509,38 @@ function initFoxy() {
     });
   }
 }
+async function mostrarMensajeOSaludo(usuario) {
+  setTimeout(async () => {
+    const foxyBubble = document.getElementById('foxy-bubble');
+    const foxyText = document.getElementById('foxy-text');
+    if (!foxyBubble || !foxyText) return;
+
+    try {
+      const { data: mensaje } = await db
+        .from('mensajes')
+        .select('*')
+        .eq('estudiante_id', usuario.id)
+        .eq('leido', false)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (mensaje) {
+        foxyBubble.classList.remove('hidden');
+        foxyText.textContent = '💌 Mensaje con amor: "' + escapeXSS(mensaje.contenido) + '"';
+        localStorage.setItem('mensajePadre', mensaje.contenido);
+        await db.from('mensajes').update({ leido: true }).eq('id', mensaje.id);
+      } else {
+        localStorage.removeItem('mensajePadre');
+        foxyBubble.classList.remove('hidden');
+        foxyText.textContent = '¡Bienvenida ' + escapeXSS(usuario.nombre) + '! Tu aventura comienza aquí 🌟';
+      }
+    } catch (e) {
+      foxyBubble.classList.remove('hidden');
+      foxyText.textContent = '¡Bienvenida ' + escapeXSS(usuario.nombre) + '! Tu aventura comienza aquí 🌟';
+    }
+  }, 800);
+}
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btnLogin').onclick = () => document.getElementById('loginModal').classList.add('active');
@@ -479,14 +567,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (usuarioActual.rol === 'estudiante') {
         document.getElementById('dashboardEstudiante').style.display = 'block';
         document.getElementById('dashUserName').innerText = escapeXSS(usuarioActual.nombre);
-        setTimeout(() => {
-          const foxyBubble = document.getElementById('foxy-bubble');
-          const foxyText = document.getElementById('foxy-text');
-          if (foxyBubble && foxyText) {
-            foxyBubble.classList.remove('hidden');
-            foxyText.textContent = '¡Bienvenida ' + escapeXSS(usuarioActual.nombre) + '! Tu aventura comienza aquí 🌟';
-          }
-        }, 800);
+        mostrarMensajeOSaludo(usuarioActual);
       } else {
   localStorage.setItem('usuarioActualId', usuarioActual.id);
   window.location.href = 'padre-dashboard.html';
