@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil | Sendero del Saber</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --gold: #FFD700;
+      --gold-dark: #e6b800;
+      --bg: #0f0c1a;
+      --bg2: #1a1530;
+      --card: #231d3a;
+      --border: #3d3460;
+      --text: #f0eaff;
+      --text-muted: #9d93c0;
+      --green: #4ade80;
+      --purple: #a855f7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(255,215,0,0.08) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 12, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .btn-back {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .btn-back:hover { background: #2d2550; color: var(--text); }
+
+    .topbar-title {
+      font-family: 'Gasoek One', sans-serif;
+      font-size: 22px;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    .profile-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .profile-avatar-wrap {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 56px;
+    }
+    .profile-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .profile-role {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+
+    .code-section {
+      background: var(--bg2);
+      border: 2px dashed var(--gold);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .code-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .code-value {
+      font-family: 'Gasoek One', sans-serif;
+      font-size: 28px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      word-break: break-all;
+    }
+
+    .code-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .btn-copy {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(168,85,247,0.35);
+    }
+    .btn-copy:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(168,85,247,0.5); }
+    .btn-copy.copied {
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      box-shadow: 0 4px 16px rgba(74,222,128,0.35);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 400;
+      gap: 16px;
+      transition: opacity 0.5s;
+    }
+    .loading-screen.hide { opacity: 0; pointer-events: none; }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-screen p {
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .topbar { padding: 12px 16px; }
+      .topbar-title { font-size: 17px; }
+      .content { padding: 32px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <p>Cargando perfil...</p>
+</div>
+
+<div class="topbar">
+  <a href="index.html" class="btn-back">← Volver</a>
+  <span class="topbar-title">👤 Mi Perfil</span>
+  <div style="width: 80px;"></div>
+</div>
+
+<div class="content">
+  <div class="profile-card">
+    <div class="profile-avatar-wrap" id="avatarWrap">⏳</div>
+    <div class="profile-name" id="profileName">Cargando...</div>
+    <div class="profile-role">Explorador del Sendero 🌿</div>
+
+    <div class="code-section">
+      <div class="code-label">Mi código de vinculación</div>
+      <div class="code-value" id="codeValue">----</div>
+      <div class="code-hint">Comparte este código con tu papá o mamá para que puedan ver tu progreso desde su panel.</div>
+      <button class="btn-copy" id="btnCopy" onclick="copiarCodigo()">📋 Copiar código</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-value" id="statMonedas">0</div>
+        <div class="stat-label">🪙 Monedas</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="statNivel">1</div>
+        <div class="stat-label">⭐ Nivel</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="statRacha">0</div>
+        <div class="stat-label">🔥 Racha</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://qxwjuevahjrdtvtylexj.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_N7ZF6WW1hC_Ncpc9-7WHSw_XRjM_qi6';
+
+  const EMOJI_MAP = {
+    'Capitan Foxy': '🏴‍☠️',
+    'Roccoe': '🦝',
+    'Kitty': '🐱',
+    'Cofre': '📦',
+    'Estrella': '⭐',
+    'Brisa': '🐶',
+    'Foxy': '🦊'
+  };
+
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentUser = null;
+  let codigoActual = '';
+
+  window.addEventListener('DOMContentLoaded', init);
+
+  async function init() {
+    const savedId = localStorage.getItem('usuarioActualId');
+    if (!savedId) { window.location.href = 'index.html'; return; }
+
+    const { data: u } = await sb
+      .from('usuarios')
+      .select('*')
+      .eq('id', savedId)
+      .single();
+
+    if (!u) { window.location.href = 'index.html'; return; }
+
+    currentUser = u;
+    codigoActual = u.codigo_vinculacion || '----';
+
+    document.getElementById('profileName').textContent = u.nombre;
+    document.getElementById('codeValue').textContent = codigoActual;
+    document.getElementById('statMonedas').textContent = (u.monedas ?? 0).toLocaleString();
+    document.getElementById('statNivel').textContent = u.nivel ?? 1;
+    document.getElementById('statRacha').textContent = u.racha_dias ?? 0;
+
+    if (u.avatar_equipado) {
+      const { data: av } = await sb
+        .from('avatares')
+        .select('imagen, nombre')
+        .eq('id', u.avatar_equipado)
+        .single();
+
+      if (av) {
+        const img = document.createElement('img');
+        img.src = `images/${av.imagen}`;
+        img.alt = av.nombre;
+        img.onerror = function() {
+          const span = document.createElement('span');
+          span.textContent = EMOJI_MAP[av.nombre] || '🎭';
+          this.replaceWith(span);
+        };
+        document.getElementById('avatarWrap').innerHTML = '';
+        document.getElementById('avatarWrap').appendChild(img);
+      }
+    } else {
+      document.getElementById('avatarWrap').textContent = '🦊';
+    }
+
+    const ls = document.getElementById('loadingScreen');
+    ls.classList.add('hide');
+    setTimeout(() => ls.remove(), 600);
+  }
+
+  function copiarCodigo() {
+    navigator.clipboard.writeText(codigoActual).then(() => {
+      const btn = document.getElementById('btnCopy');
+      btn.textContent = '✓ ¡Código copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 Copiar código';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(() => {
+      alert('Tu código es: ' + codigoActual);
+    });
+  }
+</script>
+</body>
+</html>
