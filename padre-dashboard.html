@@ -125,15 +125,29 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-overlay p { color: var(--texto-muy-claro); font-size: 0.9rem; }
     @media (max-width: 1100px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
+    .btn-menu-movil { display: none; }
+    .sidebar-overlay { display: none; }
     @media (max-width: 768px) {
-      :root { --sidebar-w: 0px; }
-      .sidebar { transform: translateX(-100%); }
+      :root { --sidebar-w: 260px; }
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 200; }
+      .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; }
       .dashboard-grid { grid-template-columns: 1fr; }
       .hero-card { flex-direction: column; align-items: flex-start; }
       .hero-right { width: 100%; }
       .content { padding: 16px; }
       .topbar { padding: 14px 16px; }
+      .btn-menu-movil {
+        display: flex; align-items: center; justify-content: center;
+        width: 38px; height: 38px; background: rgba(255,215,0,0.1);
+        border: 1px solid rgba(255,215,0,0.25); border-radius: 10px;
+        color: var(--dorado); font-size: 1.1rem; cursor: pointer; flex-shrink: 0;
+      }
+      .sidebar-overlay {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+        z-index: 150;
+      }
+      .sidebar-overlay.open { display: block; }
     }
   </style>
 </head>
@@ -185,13 +199,17 @@
     <i class="fas fa-sign-out-alt"></i> Cerrar sesión
   </div>
 </aside>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebarMovil()"></div>
 
 <div class="main">
   <header class="topbar">
     <div class="topbar-left">
+      <button class="btn-menu-movil" onclick="toggleSidebarMovil()"><i class="fas fa-bars"></i></button>
+      <div>
       <h1>¡Bienvenido, papá/mamá! 🌿</h1>
       <p id="topbarSubtitle">Este es el progreso de tu explorador</p>
     </div>
+  </div>
     <div class="topbar-right">
       <div class="topbar-user">
         <div class="topbar-user-avatar">🦊</div>
@@ -205,7 +223,6 @@
   </div>
 
   <footer class="footer-bar">
-    <div class="footer-stat">🔥 Racha: <span id="footerRacha">0 días</span></div>
     <div class="footer-stat">🪙 Monedas: <span id="footerMonedas">0</span></div>
     <div class="footer-stat">⭐ Nivel: <span id="footerNivel">1</span></div>
     <div class="footer-tip">🌿 Consejo del día: Pequeños pasos cada día, grandes logros siempre.</div>
@@ -232,6 +249,8 @@ let _actividadData = null;
 let _metasData = null;
 let _recompensasData = null;
 let _padreNombre = '';
+let _metasRonda = 1;
+let _rachaPerdida = false;
 
 function timeAgo(dateStr) {
   const diff = (Date.now() - new Date(dateStr)) / 1000;
@@ -392,11 +411,10 @@ function renderConfiguracion() {
           ${['Alertas de actividad','Logros nuevos','Mensajes de Foxy'].map(n => `
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.04);border-radius:10px">
             <span style="font-size:0.85rem;font-weight:600">${n}</span>
-            <div style="width:42px;height:24px;background:var(--dorado);border-radius:20px;cursor:pointer;position:relative">
-              <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px"></div>
-            </div>
+            <span style="font-size:0.78rem;font-weight:700;color:var(--dorado);display:flex;align-items:center;gap:6px"><i class="fas fa-circle-check"></i> Activas</span>
           </div>`).join('')}
         </div>
+        <p style="font-size:0.72rem;color:var(--texto-muy-claro);margin-top:12px">Estas notificaciones están activas para todos los padres. Pronto podrás personalizarlas 🔜</p>
       </div>
       <div class="card">
         <div class="card-title"><h3><i class="fas fa-shield-alt"></i> Control parental</h3></div>
@@ -517,14 +535,45 @@ function cambiarVista(vista, el) {
   document.getElementById('mainContent').innerHTML = (vistas[vista] || vistas.resumen)();
 }
 
-function abrirEnviarMensaje() {
+async function abrirEnviarMensaje() {
   const msg = prompt('✍️ Escribe tu mensaje para tu explorador:');
-  if (msg && msg.trim()) {
+  if (!msg || !msg.trim()) return;
+
+  const padreId = localStorage.getItem('usuarioActualId');
+  if (!padreId || !_hijoData) return;
+
+  try {
+    const { error } = await db.from('mensajes').insert({
+      padre_id: padreId,
+      estudiante_id: _hijoData.id,
+      contenido: msg.trim()
+    });
+
+    if (error) throw error;
+
     const el = document.getElementById('msgTexto');
     if (el) el.innerHTML = `"${msg.trim()}"`;
+    alert('¡Mensaje enviado! Tu explorador lo verá la próxima vez que entre.');
+
+  } catch (error) {
+    alert('Error al enviar el mensaje: ' + error.message);
   }
 }
 
+async function cargarMetas(estudianteId) {
+  const { data: todas } = await db.from('metas').select('*').eq('estudiante_id', estudianteId);
+  if (!todas || todas.length === 0) { _metasData = []; return; }
+  const ronda1 = todas.filter(m => m.ronda === 1);
+  const ronda2 = todas.filter(m => m.ronda === 2);
+  const ronda1Completa = ronda1.length > 0 && ronda1.every(m => m.completada);
+  if (ronda1Completa && ronda2.length > 0) {
+    _metasRonda = 2;
+    _metasData = ronda2.filter(m => !m.completada);
+  } else {
+    _metasRonda = 1;
+    _metasData = ronda1.filter(m => !m.completada);
+  }
+}
 // ── CARGA DE DATOS ───────────────────────────────────────────────────────────
 
 async function cargarDashboard() {
@@ -564,20 +613,17 @@ async function cargarDashboard() {
   document.getElementById('hijoMonedas').textContent = `🪙 ${monedas.toLocaleString()} monedas`;
   document.getElementById('footerMonedas').textContent = monedas.toLocaleString();
   document.getElementById('footerNivel').textContent = nivel;
-  if (hijo.racha_dias !== undefined)
-    document.getElementById('footerRacha').textContent = `${hijo.racha_dias} días`;
 
   // Cargar todos los datos en paralelo
-  const [progRes, actRes, metRes, recRes] = await Promise.all([
-    db.from('progreso_materia').select('*').eq('estudiante_id', hijo.id),
-    db.from('actividad_log').select('*').eq('estudiante_id', hijo.id).order('created_at', { ascending: false }).limit(5),
-    db.from('metas').select('*').eq('estudiante_id', hijo.id).eq('completada', false).limit(3),
-    db.from('recompensas').select('*').eq('estudiante_id', hijo.id).order('created_at', { ascending: false }).limit(3)
-  ]);
+const [progRes, actRes, recRes] = await Promise.all([
+  db.from('progreso_materia').select('*').eq('estudiante_id', hijo.id),
+  db.from('actividad_log').select('*').eq('estudiante_id', hijo.id).order('created_at', { ascending: false }).limit(5),
+  db.from('recompensas').select('*').eq('estudiante_id', hijo.id).order('created_at', { ascending: false }).limit(3)
+]);
+await cargarMetas(hijo.id);
 
   _progresosData  = progRes.data;
   _actividadData  = actRes.data;
-  _metasData      = metRes.data;
   _recompensasData = recRes.data;
 
   // Barra control parental
@@ -590,7 +636,10 @@ async function cargarDashboard() {
   document.getElementById('mainContent').innerHTML = renderResumen();
   document.getElementById('loadingOverlay').style.display = 'none';
 }
-
+function toggleSidebarMovil() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
 function cerrarSesion() {
   localStorage.removeItem('usuarioActualId');
   window.location.href = 'index.html';
